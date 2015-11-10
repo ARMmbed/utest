@@ -38,19 +38,12 @@ namespace v0 {
         STATUS_FAILURE = 0x2000,
         STATUS_FAILURE_TIMEOUT,
         STATUS_FAILURE_ASSERTION,
-
-        STATUS_EXPECT_ASYNC_CALL = 0x4000,
-    };
-
-    enum event_t {
-        EVENT_NONE = 0,
-        EVENT_ASYNC_CALL,
     };
 
     // forward declaration
     class Case;
 
-    typedef status_t (*case_handler_t)(void);
+    typedef void (*case_handler_t)(void);
     typedef status_t (*case_failure_handler_t)(const Case *const source, const status_t reason);
 
     class Case
@@ -68,7 +61,7 @@ namespace v0 {
         getDescription() const;
 
     protected:
-        Case(const char *description, const case_handler_t case_handler, const uint32_t repeats, const case_failure_handler_t failure_handler, const uint32_t timeout_ms);
+        Case(const char *description, const case_handler_t case_handler, const uint32_t repeats, const case_failure_handler_t failure_handler, const int32_t timeout_ms);
 
         const char *description;
 

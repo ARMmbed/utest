@@ -20,28 +20,24 @@
 
 using namespace mbed::test::v0;
 
-status_t test_printf()
+void test_printf()
 {
     static int counter = 0;
     printf("Called for the %u. time\n", ++counter);
-    return STATUS_SUCCESS;
 }
 
-status_t test_assert_success()
+void test_assert_success()
 {
     TEST_ASSERT_EQUAL(0, 0);
-    return STATUS_SUCCESS;
 }
 
-status_t test_assert_fail()
+void test_assert_fail()
 {
     TEST_ASSERT_EQUAL(0, 1);
-    return STATUS_SUCCESS;
 }
 
-status_t test_async_fail()
+void test_async_fail()
 {
-    return STATUS_EXPECT_ASYNC_CALL;
 }
 
 void test_async_validate()
@@ -49,10 +45,9 @@ void test_async_validate()
     TestHarness::validateCallback();
 }
 
-status_t test_async_success()
+void test_async_success()
 {
     minar::Scheduler::postCallback(test_async_validate).delay(minar::milliseconds(500)).tolerance(0);
-    return STATUS_EXPECT_ASYNC_CALL;
 }
 
 void test_async_validate_assert_fail()
@@ -61,10 +56,9 @@ void test_async_validate_assert_fail()
     TestHarness::validateCallback();
 }
 
-status_t test_async_callback_assert_fail()
+void test_async_callback_assert_fail()
 {
     minar::Scheduler::postCallback(test_async_validate_assert_fail).delay(minar::milliseconds(500)).tolerance(0);
-    return STATUS_EXPECT_ASYNC_CALL;
 }
 
 Test specification[] =
