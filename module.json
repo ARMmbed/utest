@@ -1,0 +1,15 @@
+{
+  "name": "mbed-test-async",
+  "version": "0.0.0",
+  "description": "Simple asynchronous test harness.",
+  "keywords": [
+    "testing",
+    "async"
+  ],
+  "author": "Niklas Hauser <niklas.hauser@arm.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "unity": "^1.0.0",
+    "minar": "^1.0.0"
+  }
+}
