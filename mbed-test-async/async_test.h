@@ -29,48 +29,85 @@ namespace mbed {
 namespace test {
 namespace v0 {
 
-    // the test
-    enum status_t {
-        STATUS_SUCCESS  = 0,
-        STATUS_CONTINUE = 0,
-
-        STATUS_ABORT    = 1,
-        STATUS_FAILURE = 0x2000,
-        STATUS_FAILURE_TIMEOUT,
-        STATUS_FAILURE_ASSERTION,
+    enum control_flow_t {
+        CONTROL_FLOW_NEXT   = 0,
+        CONTROL_FLOW_REPEAT = 1,
     };
 
-    // forward declaration
-    class Case;
+    enum status_t {
+        STATUS_CONTINUE = 0,
+        STATUS_ABORT,
+    };
 
-    typedef void (*case_handler_t)(void);
-    typedef status_t (*case_failure_handler_t)(const Case *const source, const status_t reason);
+    enum failure_t {
+        FAILURE_NONE = 0,
+        FAILURE,
+        FAILURE_SETUP,
+        FAILURE_TEARDOWN,
+        FAILURE_TIMEOUT,
+        FAILURE_ASSERTION,
+    };
+
+    class Case; // forward declaration
+
+    typedef status_t (*test_set_up_handler_t)   (const size_t number_of_cases);
+    typedef void     (*test_tear_down_handler_t)(const size_t passed, const size_t failed, const failure_t failure);
+
+    typedef void           (*case_handler_t)             (void);
+    typedef control_flow_t (*case_control_flow_handler_t)(void);
+
+    typedef status_t (*case_set_up_handler_t)   (const Case *const source, const size_t index_of_test);
+    typedef status_t (*case_tear_down_handler_t)(const Case *const source, const size_t passed, const size_t failed);
+    typedef status_t (*case_failure_handler_t)(const Case *const source, const failure_t reason);
+
+
+    status_t default_case_set_up_handler   (const Case *const source, const size_t index_of_case);
+    status_t default_case_tear_down_handler(const Case *const source, const size_t passed, const size_t failed);
+    status_t default_case_failure_handler  (const Case *const source, const failure_t reason);
+
+    status_t default_test_set_up_handler   (const size_t number_of_cases);
+    void     default_test_tear_down_handler(const size_t passed, const size_t failed, const failure_t failure);
+
 
     class Case
     {
     public:
-        Case(const char *description, const case_handler_t case_handler);
+        Case(const char *description,
+             const case_handler_t case_handler,
+             const case_set_up_handler_t set_up_handler = default_case_set_up_handler,
+             const case_tear_down_handler_t tear_down_handler = default_case_tear_down_handler,
+             const case_failure_handler_t failure_handler = default_case_failure_handler);
 
-        Case(const char *description, const case_handler_t case_handler, const uint32_t repeats);
-
-        Case(const char *description, const case_handler_t case_handler, const case_failure_handler_t failure_handler);
-
-        Case(const char *description, const case_handler_t case_handler, const uint32_t repeats, const case_failure_handler_t failure_handler);
+        Case(const char *description,
+             const case_control_flow_handler_t case_handler,
+             const case_set_up_handler_t set_up_handler = default_case_set_up_handler,
+             const case_tear_down_handler_t tear_down_handler = default_case_tear_down_handler,
+             const case_failure_handler_t failure_handler = default_case_failure_handler);
 
         const char*
-        getDescription() const;
+        get_description() const;
 
     protected:
-        Case(const char *description, const case_handler_t case_handler, const uint32_t repeats, const case_failure_handler_t failure_handler, const int32_t timeout_ms);
+        Case(const char *description,
+             const case_handler_t case_handler,
+             const case_control_flow_handler_t control_flow_handler,
+             const case_set_up_handler_t set_up_handler,
+             const case_tear_down_handler_t tear_down_handler,
+             const case_failure_handler_t failure_handler,
+             const int32_t timeout_ms);
 
+    private:
         const char *description;
 
-        const case_handler_t case_handler;
-        const uint32_t repeats;
+        const case_handler_t handler;
+        const case_control_flow_handler_t control_flow_handler;
+
+        const case_set_up_handler_t set_up_handler;
+        const case_tear_down_handler_t tear_down_handler;
+
         const case_failure_handler_t failure_handler;
 
         const int32_t timeout_ms;
-        // const uint32_t *const expected_calls;
 
         friend class TestHarness;
     };
@@ -79,38 +116,46 @@ namespace v0 {
     {
         friend class TestHarness;
     public:
-        AsyncCase(const char *description, const case_handler_t case_handler, const uint32_t timeout_ms);
+        AsyncCase(const char *description,
+                  const case_handler_t case_handler,
+                  const uint32_t timeout_ms,
+                  const case_set_up_handler_t set_up_handler = default_case_set_up_handler,
+                  const case_tear_down_handler_t tear_down_handler = default_case_tear_down_handler,
+                  const case_failure_handler_t failure_handler = default_case_failure_handler);
 
-        AsyncCase(const char *description, const case_handler_t case_handler, const uint32_t repeats, const uint32_t timeout_ms);
-
-        AsyncCase(const char *description, const case_handler_t case_handler, const case_failure_handler_t failure_handler, const uint32_t timeout_ms);
-
-        AsyncCase(const char *description, const case_handler_t case_handler, const uint32_t repeats, const case_failure_handler_t failure_handler, const uint32_t timeout_ms);
+        AsyncCase(const char *description,
+                  const case_control_flow_handler_t case_handler,
+                  const uint32_t timeout_ms,
+                  const case_set_up_handler_t set_up_handler = default_case_set_up_handler,
+                  const case_tear_down_handler_t tear_down_handler = default_case_tear_down_handler,
+                  const case_failure_handler_t failure_handler = default_case_failure_handler);
     };
 
     typedef Case Test;
-    typedef status_t (*set_up_handler_t)(const size_t number_of_tests);
-    typedef void (*tear_down_handler_t)(const size_t passed, const size_t failed);
-
-    status_t default_failure_handler(const Case *const source, const status_t reason);
-    status_t default_set_up_handler(const size_t number_of_tests);
-    void default_tear_down_handler(const size_t passed, const size_t failed);
 
     class TestHarness
     {
     public:
         template< size_t N >
-        static void run(Test (&specification)[N], const set_up_handler_t set_up = default_set_up_handler, const tear_down_handler_t tear_down = default_tear_down_handler) {
-            run(specification, N, set_up, tear_down);
+        static void run(Test (&specification)[N],
+                        const test_set_up_handler_t set_up_handler = default_test_set_up_handler,
+                        const test_tear_down_handler_t tear_down_handler = default_test_tear_down_handler) {
+            run(specification, N, set_up_handler, tear_down_handler);
         }
 
-        static void validateCallback();
+        static void validate_callback();
+
+        static void raise_failure(failure_t reason);
 
     protected:
-        static void run(const Test *const specification, const size_t length, const set_up_handler_t set_up, const tear_down_handler_t tear_down);
-        static void run_next_test();
-        static void handle_failure(status_t reason);
+        static void run(const Test *const specification,
+                        const size_t length,
+                        const test_set_up_handler_t set_up_handler,
+                        const test_tear_down_handler_t tear_down_handler);
+
+        static void run_next_case();
         static void handle_timeout();
+        static void schedule_next_case();
     };
 
 }

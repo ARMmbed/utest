@@ -20,10 +20,12 @@
 
 using namespace mbed::test::v0;
 
-void test_printf()
+control_flow_t test_printf()
 {
     static int counter = 0;
     printf("Called for the %u. time\n", ++counter);
+
+    return (counter < 6) ? CONTROL_FLOW_REPEAT : CONTROL_FLOW_NEXT;
 }
 
 void test_assert_success()
@@ -42,7 +44,7 @@ void test_async_fail()
 
 void test_async_validate()
 {
-    TestHarness::validateCallback();
+    TestHarness::validate_callback();
 }
 
 void test_async_success()
@@ -52,8 +54,9 @@ void test_async_success()
 
 void test_async_validate_assert_fail()
 {
-    TEST_ASSERT_NOT_EQUAL(0, 0);    // this messes up the stack, due to longjmp usage
-    TestHarness::validateCallback();
+    TEST_ASSERT_NOT_EQUAL(0, 0);
+    TEST_ASSERT_EQUAL_PTR(0, 1);
+    TestHarness::validate_callback();
 }
 
 void test_async_callback_assert_fail()
@@ -63,12 +66,12 @@ void test_async_callback_assert_fail()
 
 Test specification[] =
 {
-    Case("test repeats (success)", test_printf, 3),
+    Case("test repeats (success)", test_printf),
     Case("test assert (fail)", test_assert_fail),
     AsyncCase("test async (fail)", test_async_fail, 200),
     AsyncCase("test async (success)", test_async_success, 1000),
     AsyncCase("test async callback (fail)", test_async_callback_assert_fail, 1000),
-    Case("printf with integer formatting", test_assert_success),
+    Case("printf with integer formatting (success)", test_assert_success),
 };
 
 
