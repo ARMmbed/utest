@@ -22,7 +22,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "unity/unity.h"
 
 
 namespace mbed {

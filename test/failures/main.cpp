@@ -30,32 +30,38 @@ control_flow_t test_printf()
 
 void test_assert_success()
 {
-    TEST_ASSERT_EQUAL(0, 0);
+    printf("passing.\n");
 }
 
 void test_assert_fail()
 {
-    TEST_ASSERT_EQUAL(0, 1);
+    printf("failing.\n");
+    TestHarness::raise_failure(FAILURE_ASSERTION);
 }
 
 void test_async_fail()
 {
+    printf("not generating an asynchronous callback.\n");
 }
 
 void test_async_validate()
 {
+    printf("asynchronous callback.\n");
     TestHarness::validate_callback();
 }
 
 void test_async_success()
 {
+    printf("generating an asynchronous callback.\n");
     minar::Scheduler::postCallback(test_async_validate).delay(minar::milliseconds(500)).tolerance(0);
 }
 
 void test_async_validate_assert_fail()
 {
-    TEST_ASSERT_NOT_EQUAL(0, 0);
-    TEST_ASSERT_EQUAL_PTR(0, 1);
+    printf("failing.\n");
+    TestHarness::raise_failure(FAILURE_ASSERTION);
+    printf("failing again.\n");
+    TestHarness::raise_failure(FAILURE_ASSERTION);
     TestHarness::validate_callback();
 }
 
