@@ -45,6 +45,7 @@ namespace v0 {
         FAILURE_TEARDOWN,
         FAILURE_TIMEOUT,
         FAILURE_ASSERTION,
+        FAILURE_CASES,
     };
 
     class Case; // forward declaration
@@ -56,7 +57,7 @@ namespace v0 {
     typedef control_flow_t (*case_control_flow_handler_t)(void);
 
     typedef status_t (*case_set_up_handler_t)   (const Case *const source, const size_t index_of_test);
-    typedef status_t (*case_tear_down_handler_t)(const Case *const source, const size_t passed, const size_t failed);
+    typedef status_t (*case_tear_down_handler_t)(const Case *const source, const size_t passed, const size_t failed, const failure_t reason);
     typedef status_t (*case_failure_handler_t)(const Case *const source, const failure_t reason);
 
 }

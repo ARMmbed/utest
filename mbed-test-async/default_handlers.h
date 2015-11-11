@@ -75,7 +75,7 @@ namespace v0 {
     void     verbose_test_tear_down_handler(const size_t passed, const size_t failed, const failure_t failure);
 
     status_t verbose_case_set_up_handler   (const Case *const source, const size_t index_of_case);
-    status_t verbose_case_tear_down_handler(const Case *const source, const size_t passed, const size_t failed);
+    status_t verbose_case_tear_down_handler(const Case *const source, const size_t passed, const size_t failed, const failure_t failure);
     status_t verbose_case_failure_handler  (const Case *const source, const failure_t reason);
 
     const handlers_t verbose_handlers = {
