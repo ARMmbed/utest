@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 #include "mbed-drivers/mbed.h"
-#include "mbed-test-async/async_test.h"
+#include "mbed-test-async/test.h"
 
 
 using namespace mbed::test::v0;
@@ -85,5 +85,6 @@ void app_start(int, char*[]) {
     static Serial pc(USBTX, USBRX);
     pc.baud(115200);
 
-    TestHarness::run(specification);
+    Harness::set_default_handlers(verbose_handlers);
+    Harness::run(specification);
 }
