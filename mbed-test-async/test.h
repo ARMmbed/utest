@@ -16,11 +16,12 @@
  ****************************************************************************
  */
 
-#ifndef MBED_TEST_ASYNC_UNITY_ASSERT_FAILURE_H
-#define MBED_TEST_ASYNC_UNITY_ASSERT_FAILURE_H
+#ifndef MBED_TEST_ASYNC_H
+#define MBED_TEST_ASYNC_H
 
-#include <stdint.h>
+#include "types.h"
+#include "case.h"
+#include "default_handlers.h"
+#include "harness.h"
 
-void mbed_test_unity_assert_failure();
-
-#endif // MBED_ASYNC_TEST_UNITY_ASSERT_FAILURE_H
+#endif // MBED_TEST_ASYNC_H

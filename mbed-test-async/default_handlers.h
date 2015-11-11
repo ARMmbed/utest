@@ -16,11 +16,30 @@
  ****************************************************************************
  */
 
-#ifndef MBED_TEST_ASYNC_UNITY_ASSERT_FAILURE_H
-#define MBED_TEST_ASYNC_UNITY_ASSERT_FAILURE_H
+#ifndef MBED_TEST_ASYNC_DEFAULT_HANDLER_H
+#define MBED_TEST_ASYNC_DEFAULT_HANDLER_H
 
 #include <stdint.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include "types.h"
 
-void mbed_test_unity_assert_failure();
 
-#endif // MBED_ASYNC_TEST_UNITY_ASSERT_FAILURE_H
+namespace mbed {
+namespace test {
+namespace v0 {
+
+    class Case;
+
+    status_t default_test_set_up_handler   (const size_t number_of_cases);
+    void     default_test_tear_down_handler(const size_t passed, const size_t failed, const failure_t failure);
+
+    status_t default_case_set_up_handler   (const Case *const source, const size_t index_of_case);
+    status_t default_case_tear_down_handler(const Case *const source, const size_t passed, const size_t failed);
+    status_t default_case_failure_handler  (const Case *const source, const failure_t reason);
+
+}
+}
+}
+
+#endif // MBED_TEST_ASYNC_DEFAULT_HANDLER_H
