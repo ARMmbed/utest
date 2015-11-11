@@ -9,6 +9,7 @@
   "author": "Niklas Hauser <niklas.hauser@arm.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "minar": "^1.0.0"
+    "minar": "^1.0.0",
+    "core-util": "^1.0.1"
   }
 }
