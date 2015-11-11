@@ -29,15 +29,62 @@ namespace mbed {
 namespace test {
 namespace v0 {
 
-    class Case;
+    const struct
+    {
+        operator test_set_up_handler_t()    const { return test_set_up_handler_t(1); }
+        operator test_tear_down_handler_t() const { return test_tear_down_handler_t(1); }
 
-    status_t default_test_set_up_handler   (const size_t number_of_cases);
-    void     default_test_tear_down_handler(const size_t passed, const size_t failed, const failure_t failure);
+        operator case_set_up_handler_t()    const { return case_set_up_handler_t(1); }
+        operator case_tear_down_handler_t() const { return case_tear_down_handler_t(1); }
+        operator case_failure_handler_t()   const { return case_failure_handler_t(1); }
+    } default_handler;
 
-    status_t default_case_set_up_handler   (const Case *const source, const size_t index_of_case);
-    status_t default_case_tear_down_handler(const Case *const source, const size_t passed, const size_t failed);
-    status_t default_case_failure_handler  (const Case *const source, const failure_t reason);
+    struct handlers_t
+    {
+        test_set_up_handler_t test_set_up;
+        test_tear_down_handler_t test_tear_down;
 
+        case_set_up_handler_t case_set_up;
+        case_tear_down_handler_t case_tear_down;
+        case_failure_handler_t case_failure;
+
+        inline test_set_up_handler_t get_handler(test_set_up_handler_t handler) const {
+            if (handler == default_handler) return test_set_up;
+            return handler;
+        }
+        inline test_tear_down_handler_t get_handler(test_tear_down_handler_t handler) const {
+            if (handler == default_handler) return test_tear_down;
+            return handler;
+        }
+
+        inline case_set_up_handler_t get_handler(case_set_up_handler_t handler) const {
+            if (handler == default_handler) return case_set_up;
+            return handler;
+        }
+        inline case_tear_down_handler_t get_handler(case_tear_down_handler_t handler) const {
+            if (handler == default_handler) return case_tear_down;
+            return handler;
+        }
+        inline case_failure_handler_t get_handler(case_failure_handler_t handler) const {
+            if (handler == default_handler) return case_failure;
+            return handler;
+        }
+    };
+
+    status_t verbose_test_set_up_handler   (const size_t number_of_cases);
+    void     verbose_test_tear_down_handler(const size_t passed, const size_t failed, const failure_t failure);
+
+    status_t verbose_case_set_up_handler   (const Case *const source, const size_t index_of_case);
+    status_t verbose_case_tear_down_handler(const Case *const source, const size_t passed, const size_t failed);
+    status_t verbose_case_failure_handler  (const Case *const source, const failure_t reason);
+
+    const handlers_t verbose_handlers = {
+        verbose_test_set_up_handler,
+        verbose_test_tear_down_handler,
+        verbose_case_set_up_handler,
+        verbose_case_tear_down_handler,
+        verbose_case_failure_handler
+    };
 }
 }
 }

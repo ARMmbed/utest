@@ -39,10 +39,12 @@ namespace v0 {
     public:
         template< size_t N >
         static void run(Test (&specification)[N],
-                        const test_set_up_handler_t set_up_handler = default_test_set_up_handler,
-                        const test_tear_down_handler_t tear_down_handler = default_test_tear_down_handler) {
+                        const test_set_up_handler_t set_up_handler = default_handler,
+                        const test_tear_down_handler_t tear_down_handler = default_handler) {
             run(specification, N, set_up_handler, tear_down_handler);
         }
+
+        static void set_default_handlers(const handlers_t defaults);
 
         static void validate_callback();
 

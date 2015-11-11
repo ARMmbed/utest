@@ -34,15 +34,15 @@ namespace v0 {
     public:
         Case(const char *description,
              const case_handler_t case_handler,
-             const case_set_up_handler_t set_up_handler = default_case_set_up_handler,
-             const case_tear_down_handler_t tear_down_handler = default_case_tear_down_handler,
-             const case_failure_handler_t failure_handler = default_case_failure_handler);
+             const case_set_up_handler_t set_up_handler = default_handler,
+             const case_tear_down_handler_t tear_down_handler = default_handler,
+             const case_failure_handler_t failure_handler = default_handler);
 
         Case(const char *description,
              const case_control_flow_handler_t case_handler,
-             const case_set_up_handler_t set_up_handler = default_case_set_up_handler,
-             const case_tear_down_handler_t tear_down_handler = default_case_tear_down_handler,
-             const case_failure_handler_t failure_handler = default_case_failure_handler);
+             const case_set_up_handler_t set_up_handler = default_handler,
+             const case_tear_down_handler_t tear_down_handler = default_handler,
+             const case_failure_handler_t failure_handler = default_handler);
 
         const char*
         get_description() const;
@@ -79,16 +79,16 @@ namespace v0 {
         AsyncCase(const char *description,
                   const case_handler_t case_handler,
                   const uint32_t timeout_ms,
-                  const case_set_up_handler_t set_up_handler = default_case_set_up_handler,
-                  const case_tear_down_handler_t tear_down_handler = default_case_tear_down_handler,
-                  const case_failure_handler_t failure_handler = default_case_failure_handler);
+                  const case_set_up_handler_t set_up_handler = default_handler,
+                  const case_tear_down_handler_t tear_down_handler = default_handler,
+                  const case_failure_handler_t failure_handler = default_handler);
 
         AsyncCase(const char *description,
                   const case_control_flow_handler_t case_handler,
                   const uint32_t timeout_ms,
-                  const case_set_up_handler_t set_up_handler = default_case_set_up_handler,
-                  const case_tear_down_handler_t tear_down_handler = default_case_tear_down_handler,
-                  const case_failure_handler_t failure_handler = default_case_failure_handler);
+                  const case_set_up_handler_t set_up_handler = default_handler,
+                  const case_tear_down_handler_t tear_down_handler = default_handler,
+                  const case_failure_handler_t failure_handler = default_handler);
     };
 }
 }
