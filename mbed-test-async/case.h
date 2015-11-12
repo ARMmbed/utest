@@ -47,6 +47,9 @@ namespace v0 {
         const char*
         get_description() const;
 
+        bool
+        is_empty() const;
+
     protected:
         Case(const char *description,
              const case_handler_t case_handler,

@@ -42,6 +42,7 @@ namespace v0 {
         FAILURE_NONE = 0,   ///< No failure occurred
         FAILURE,            ///< An unknown failure occurred
         FAILURE_CASES,      ///< A failure occurred in at least one test case
+        FAILURE_EMPTY_CASE, ///< The test case contains only empty handlers
         FAILURE_SETUP,      ///< A failure occurred on setup
         FAILURE_TEARDOWN,   ///< A failure occurred on teardown
         FAILURE_TIMEOUT,    ///< An expected asynchronous call timed out
