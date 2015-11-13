@@ -34,21 +34,38 @@ namespace v0 {
     {
     public:
         template< size_t N >
-        Specification(const Case (&cases)[N]) :
-            set_up_handler(default_handler), tear_down_handler(default_handler), cases(cases), length(N)
+        Specification(const Case (&cases)[N],
+                      const test_tear_down_handler_t tear_down_handler = default_handler,
+                      const handlers_t defaults = default_handlers) :
+            set_up_handler(default_handler), tear_down_handler(tear_down_handler),
+            cases(cases), length(N),
+            defaults(defaults)
         {}
 
         template< size_t N >
-        Specification(const Case (&cases)[N],
-                      const test_tear_down_handler_t tear_down_handler) :
-            set_up_handler(default_handler), tear_down_handler(tear_down_handler), cases(cases), length(N)
+        Specification(const Case (&cases)[N], const handlers_t defaults) :
+            set_up_handler(default_handler), tear_down_handler(default_handler),
+            cases(cases), length(N),
+            defaults(defaults)
         {}
 
         template< size_t N >
         Specification(const test_set_up_handler_t set_up_handler,
                       const Case (&cases)[N],
-                      const test_tear_down_handler_t tear_down_handler = default_handler) :
-            set_up_handler(set_up_handler), tear_down_handler(tear_down_handler), cases(cases), length(N)
+                      const test_tear_down_handler_t tear_down_handler = default_handler,
+                      const handlers_t defaults = default_handlers) :
+            set_up_handler(set_up_handler), tear_down_handler(tear_down_handler),
+            cases(cases), length(N),
+            defaults(defaults)
+        {}
+
+        template< size_t N >
+        Specification(const test_set_up_handler_t set_up_handler,
+                      const Case (&cases)[N],
+                      const handlers_t defaults) :
+            set_up_handler(set_up_handler), tear_down_handler(default_handler),
+            cases(cases), length(N),
+            defaults(defaults)
         {}
 
     private:
@@ -56,6 +73,7 @@ namespace v0 {
         const test_tear_down_handler_t tear_down_handler;
         const Case *const cases;
         const size_t length;
+        const handlers_t defaults;
 
         friend class Harness;
     };

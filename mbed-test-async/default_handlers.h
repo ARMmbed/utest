@@ -78,7 +78,7 @@ namespace v0 {
     status_t verbose_case_tear_down_handler(const Case *const source, const size_t passed, const size_t failed, const failure_t failure);
     status_t verbose_case_failure_handler  (const Case *const source, const failure_t reason);
 
-    const handlers_t verbose_handlers = {
+    const handlers_t verbose_continue_handlers = {
         verbose_test_set_up_handler,
         verbose_test_tear_down_handler,
         verbose_case_set_up_handler,
@@ -92,13 +92,23 @@ namespace v0 {
 
     status_t greentea_case_failure_handler  (const Case *const source, const failure_t reason);
 
-    const handlers_t greentea_handlers = {
+    const handlers_t greentea_abort_handlers = {
         greentea_test_set_up_handler,
         greentea_test_tear_down_handler,
         verbose_case_set_up_handler,
         verbose_case_tear_down_handler,
         greentea_case_failure_handler
     };
+
+    const handlers_t greentea_continue_handlers = {
+        greentea_test_set_up_handler,
+        greentea_test_tear_down_handler,
+        verbose_case_set_up_handler,
+        verbose_case_tear_down_handler,
+        verbose_case_failure_handler
+    };
+
+    const handlers_t default_handlers = greentea_abort_handlers;
 }
 }
 }

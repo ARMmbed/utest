@@ -38,8 +38,6 @@ namespace v0 {
     public:
         static void run(const Specification specification);
 
-        static void set_default_handlers(const handlers_t defaults);
-
         static void validate_callback();
         static void raise_failure(failure_t reason);
 
