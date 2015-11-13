@@ -29,6 +29,15 @@ namespace mbed {
 namespace test {
 namespace v0 {
 
+    /** @brief Test case wrapper class.
+     *
+     * This class contains the description of the test case and all handlers
+     * for setting up, running the test case, tearing down and handling failures.
+     *
+     * By default you only need to provide a description and a test case handler.
+     * You may override the setup, teardown and failure handlers, but you do not have to.
+     * If you do not override these handler, the specified default handlers will be called.
+     */
     class Case
     {
     public:
@@ -75,6 +84,12 @@ namespace v0 {
         friend class Harness;
     };
 
+    /** @brief Test case wrapper class for asynchronous calls.
+     *
+     * This class only expands on the base class by including a timeout (in milliseconds)
+     * after which the test is declared as failed.
+     * You need to call `Harness::validate_callback();` to cancel the timeout.
+     */
     class AsyncCase : public Case
     {
         friend class Harness;
