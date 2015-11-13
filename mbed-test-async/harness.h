@@ -26,36 +26,24 @@
 #include "types.h"
 #include "case.h"
 #include "default_handlers.h"
+#include "specification.h"
 
 
 namespace mbed {
 namespace test {
 namespace v0 {
 
-    typedef Case Test;
-
     class Harness
     {
     public:
-        template< size_t N >
-        static void run(Test (&specification)[N],
-                        const test_set_up_handler_t set_up_handler = default_handler,
-                        const test_tear_down_handler_t tear_down_handler = default_handler) {
-            run(specification, N, set_up_handler, tear_down_handler);
-        }
+        static void run(const Specification specification);
 
         static void set_default_handlers(const handlers_t defaults);
 
         static void validate_callback();
-
         static void raise_failure(failure_t reason);
 
     protected:
-        static void run(const Test *const specification,
-                        const size_t length,
-                        const test_set_up_handler_t set_up_handler,
-                        const test_tear_down_handler_t tear_down_handler);
-
         static void run_next_case();
         static void handle_timeout();
         static void schedule_next_case();

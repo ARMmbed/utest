@@ -70,7 +70,7 @@ void test_async_callback_assert_fail()
     minar::Scheduler::postCallback(test_async_validate_assert_fail).delay(minar::milliseconds(500)).tolerance(0);
 }
 
-Test specification[] =
+Case specification[] =
 {
     Case("test repeats (success)", test_printf),
     Case("test assert (fail)", test_assert_fail),
