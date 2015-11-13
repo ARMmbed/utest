@@ -22,7 +22,7 @@
 
 using namespace mbed::test::v0;
 
-control_flow_t test_printf()
+control_flow_t test_repeat()
 {
     static int counter = 0;
     printf("Called for the %u. time\n", ++counter);
@@ -76,7 +76,7 @@ status_t test_failed_teardown(const Case *const /*source*/, const size_t /*passe
     return STATUS_CONTINUE;
 }
 
-status_t setup(const size_t number_of_cases)
+status_t greentea_setup(const size_t number_of_cases)
 {
     MBED_HOSTTEST_TIMEOUT(20);
     MBED_HOSTTEST_SELECT(default_auto);
@@ -88,16 +88,16 @@ status_t setup(const size_t number_of_cases)
 
 const Case cases[] =
 {
-    Case("NULL test (fail)", (case_handler_t)NULL, NULL, NULL),
-    Case("test repeats (success)", test_printf),
-    Case("test assert (fail)", test_assert_fail, test_failed_setup),
-    AsyncCase("test async (fail)", test_async_fail, 200, default_handler, test_failed_teardown),
+    Case("NULL test (fail)", ignore_handler, (case_handler_t)ignore_handler, ignore_handler),
+    Case("test repeats (success)", test_repeat),
+    Case("test assert (fail)", test_failed_setup, test_assert_fail),
+    AsyncCase("test async (fail)", test_async_fail, test_failed_teardown, 200),
     AsyncCase("test async (success)", test_async_success, 1000),
     AsyncCase("test async callback (fail)", test_async_callback_assert_fail, 1000),
     Case("printf with integer formatting (success)", test_assert_success),
 };
 
-const Specification specification(setup, cases, greentea_continue_handlers);
+const Specification specification(greentea_setup, cases, greentea_continue_handlers);
 
 
 void app_start(int, char*[]) {

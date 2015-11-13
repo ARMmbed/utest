@@ -36,7 +36,7 @@ void test_assert_fail()
 }
 
 
-status_t setup(const size_t number_of_cases)
+status_t greentea_setup(const size_t number_of_cases)
 {
     MBED_HOSTTEST_TIMEOUT(20);
     MBED_HOSTTEST_SELECT(default_auto);
@@ -52,7 +52,7 @@ Case cases[] =
     Case("test assert (fail)", test_assert_fail),
 };
 
-Specification specification(setup, cases);
+Specification specification(greentea_setup, cases);
 
 void app_start(int, char*[]) {
     static Serial pc(USBTX, USBRX);

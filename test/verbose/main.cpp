@@ -72,7 +72,7 @@ void test_async_callback_assert_fail()
 
 Case cases[] =
 {
-    Case("NULL test (fail)", (case_handler_t)NULL, NULL, NULL),
+    Case("NULL test (fail)", ignore_handler, (case_handler_t)ignore_handler, ignore_handler),
     Case("test repeats (success)", test_repeat),
     Case("test assert (fail)", test_assert_fail),
     AsyncCase("test async (fail)", test_async_fail, 200),

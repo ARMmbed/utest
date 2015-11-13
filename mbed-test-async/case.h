@@ -37,21 +37,53 @@ namespace v0 {
      * By default you only need to provide a description and a test case handler.
      * You may override the setup, teardown and failure handlers, but you do not have to.
      * If you do not override these handler, the specified default handlers will be called.
+     *
+     * These constructors are overloaded to allow you a comfortable declaration of all your
+     * callbacks.
+     * The order is always:
+     *  - description (required)
+     *  - setup handler (optional)
+     *  - test case handler (required)
+     *  - teardown handler (optional)
+     *  - failure handler (optional)
+     *
+     * @note While you can specify an empty test case (ie. use `ignore_handler` for all callbacks),
+     *       the harness will abort the test unconditionally.
      */
     class Case
     {
     public:
         Case(const char *description,
+             const case_set_up_handler_t set_up_handler,
              const case_handler_t case_handler,
-             const case_set_up_handler_t set_up_handler = default_handler,
              const case_tear_down_handler_t tear_down_handler = default_handler,
              const case_failure_handler_t failure_handler = default_handler);
 
         Case(const char *description,
-             const case_control_flow_handler_t case_handler,
-             const case_set_up_handler_t set_up_handler = default_handler,
-             const case_tear_down_handler_t tear_down_handler = default_handler,
+             const case_handler_t case_handler,
              const case_failure_handler_t failure_handler = default_handler);
+
+        Case(const char *description,
+             const case_handler_t case_handler,
+             const case_tear_down_handler_t tear_down_handler,
+             const case_failure_handler_t failure_handler = default_handler);
+
+
+        Case(const char *description,
+            const case_set_up_handler_t set_up_handler,
+            const case_control_flow_handler_t case_handler,
+            const case_tear_down_handler_t tear_down_handler = default_handler,
+            const case_failure_handler_t failure_handler = default_handler);
+
+        Case(const char *description,
+            const case_control_flow_handler_t case_handler,
+            const case_failure_handler_t failure_handler = default_handler);
+
+        Case(const char *description,
+            const case_control_flow_handler_t case_handler,
+            const case_tear_down_handler_t tear_down_handler,
+            const case_failure_handler_t failure_handler = default_handler);
+
 
         const char*
         get_description() const;
@@ -61,9 +93,9 @@ namespace v0 {
 
     protected:
         Case(const char *description,
+             const case_set_up_handler_t set_up_handler,
              const case_handler_t case_handler,
              const case_control_flow_handler_t control_flow_handler,
-             const case_set_up_handler_t set_up_handler,
              const case_tear_down_handler_t tear_down_handler,
              const case_failure_handler_t failure_handler,
              const int32_t timeout_ms);
@@ -89,24 +121,116 @@ namespace v0 {
      * This class only expands on the base class by including a timeout (in milliseconds)
      * after which the test is declared as failed.
      * You need to call `Harness::validate_callback();` to cancel the timeout.
+     *
+     * These constructors are overloaded to allow you a comfortable declaration of all your
+     * callbacks.
+     * The order is always:
+     *  - description (required)
+     *  - setup handler (optional)
+     *  - test case handler (required)
+     *  - teardown handler (optional)
+     *  - failure handler (optional)
+     *  - timeout in ms (required)
      */
     class AsyncCase : public Case
     {
         friend class Harness;
+
     public:
         AsyncCase(const char *description,
                   const case_handler_t case_handler,
-                  const uint32_t timeout_ms,
-                  const case_set_up_handler_t set_up_handler = default_handler,
-                  const case_tear_down_handler_t tear_down_handler = default_handler,
-                  const case_failure_handler_t failure_handler = default_handler);
+                  const uint32_t timeout_ms);
+
+        AsyncCase(const char *description,
+                  const case_set_up_handler_t set_up_handler,
+                  const case_handler_t case_handler,
+                  const uint32_t timeout_ms);
+
+
+        AsyncCase(const char *description,
+                  const case_handler_t case_handler,
+                  const case_tear_down_handler_t tear_down_handler,
+                  const uint32_t timeout_ms);
+
+        AsyncCase(const char *description,
+                  const case_set_up_handler_t set_up_handler,
+                  const case_handler_t case_handler,
+                  const case_tear_down_handler_t tear_down_handler,
+                  const uint32_t timeout_ms);
+
+
+        AsyncCase(const char *description,
+                  const case_handler_t case_handler,
+                  const case_failure_handler_t failure_handler,
+                  const uint32_t timeout_ms);
+
+        AsyncCase(const char *description,
+                  const case_set_up_handler_t set_up_handler,
+                  const case_handler_t case_handler,
+                  const case_failure_handler_t failure_handler,
+                  const uint32_t timeout_ms);
+
+
+        AsyncCase(const char *description,
+                  const case_handler_t case_handler,
+                  const case_tear_down_handler_t tear_down_handler,
+                  const case_failure_handler_t failure_handler,
+                  const uint32_t timeout_ms);
+
+        AsyncCase(const char *description,
+                  const case_set_up_handler_t set_up_handler,
+                  const case_handler_t case_handler,
+                  const case_tear_down_handler_t tear_down_handler,
+                  const case_failure_handler_t failure_handler,
+                  const uint32_t timeout_ms);
+
+    public:
+        AsyncCase(const char *description,
+                  const case_control_flow_handler_t case_handler,
+                  const uint32_t timeout_ms);
+
+        AsyncCase(const char *description,
+                  const case_set_up_handler_t set_up_handler,
+                  const case_control_flow_handler_t case_handler,
+                  const uint32_t timeout_ms);
+
 
         AsyncCase(const char *description,
                   const case_control_flow_handler_t case_handler,
-                  const uint32_t timeout_ms,
-                  const case_set_up_handler_t set_up_handler = default_handler,
-                  const case_tear_down_handler_t tear_down_handler = default_handler,
-                  const case_failure_handler_t failure_handler = default_handler);
+                  const case_tear_down_handler_t tear_down_handler,
+                  const uint32_t timeout_ms);
+
+        AsyncCase(const char *description,
+                  const case_set_up_handler_t set_up_handler,
+                  const case_control_flow_handler_t case_handler,
+                  const case_tear_down_handler_t tear_down_handler,
+                  const uint32_t timeout_ms);
+
+
+        AsyncCase(const char *description,
+                  const case_control_flow_handler_t case_handler,
+                  const case_failure_handler_t failure_handler,
+                  const uint32_t timeout_ms);
+
+        AsyncCase(const char *description,
+                  const case_set_up_handler_t set_up_handler,
+                  const case_control_flow_handler_t case_handler,
+                  const case_failure_handler_t failure_handler,
+                  const uint32_t timeout_ms);
+
+
+        AsyncCase(const char *description,
+                  const case_control_flow_handler_t case_handler,
+                  const case_tear_down_handler_t tear_down_handler,
+                  const case_failure_handler_t failure_handler,
+                  const uint32_t timeout_ms);
+
+        AsyncCase(const char *description,
+                  const case_set_up_handler_t set_up_handler,
+                  const case_control_flow_handler_t case_handler,
+                  const case_tear_down_handler_t tear_down_handler,
+                  const case_failure_handler_t failure_handler,
+                  const uint32_t timeout_ms);
     };
 }
 }

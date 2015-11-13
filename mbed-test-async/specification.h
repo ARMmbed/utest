@@ -30,6 +30,11 @@ namespace mbed {
 namespace test {
 namespace v0 {
 
+    /** @brief Test specification containing the setup and teardown handlers and test cases.
+     *
+     * This class simply holds the test cases and allows you to specify default handlers, and
+     * override setup and teardown handlers.
+     */
     class Specification
     {
     public:
