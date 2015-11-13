@@ -20,7 +20,7 @@
 
 using namespace mbed::test::v0;
 
-control_flow_t test_printf()
+control_flow_t test_repeat()
 {
     static int counter = 0;
     printf("Called for the %u. time\n", ++counter);
@@ -36,7 +36,7 @@ void test_assert_success()
 void test_assert_fail()
 {
     printf("failing.\n");
-    TestHarness::raise_failure(FAILURE_ASSERTION);
+    Harness::raise_failure(FAILURE_ASSERTION);
 }
 
 void test_async_fail()
@@ -47,7 +47,7 @@ void test_async_fail()
 void test_async_validate()
 {
     printf("asynchronous callback.\n");
-    TestHarness::validate_callback();
+    Harness::validate_callback();
 }
 
 void test_async_success()
@@ -59,10 +59,10 @@ void test_async_success()
 void test_async_validate_assert_fail()
 {
     printf("failing.\n");
-    TestHarness::raise_failure(FAILURE_ASSERTION);
+    Harness::raise_failure(FAILURE_ASSERTION);
     printf("failing again.\n");
-    TestHarness::raise_failure(FAILURE_ASSERTION);
-    TestHarness::validate_callback();
+    Harness::raise_failure(FAILURE_ASSERTION);
+    Harness::validate_callback();
 }
 
 void test_async_callback_assert_fail()
@@ -70,9 +70,10 @@ void test_async_callback_assert_fail()
     minar::Scheduler::postCallback(test_async_validate_assert_fail).delay(minar::milliseconds(500)).tolerance(0);
 }
 
-Case specification[] =
+Case cases[] =
 {
-    Case("test repeats (success)", test_printf),
+    Case("NULL test (fail)", (case_handler_t)NULL, NULL, NULL),
+    Case("test repeats (success)", test_repeat),
     Case("test assert (fail)", test_assert_fail),
     AsyncCase("test async (fail)", test_async_fail, 200),
     AsyncCase("test async (success)", test_async_success, 1000),
@@ -80,11 +81,12 @@ Case specification[] =
     Case("printf with integer formatting (success)", test_assert_success),
 };
 
+Specification specification(cases, verbose_continue_handlers);
+
 
 void app_start(int, char*[]) {
     static Serial pc(USBTX, USBRX);
     pc.baud(115200);
 
-    Harness::set_default_handlers(verbose_handlers);
     Harness::run(specification);
 }

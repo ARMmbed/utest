@@ -11,5 +11,8 @@
   "dependencies": {
     "minar": "^1.0.0",
     "core-util": "^1.0.1"
+  },
+  "testDependencies": {
+    "unity": "^1.0.0"
   }
 }
