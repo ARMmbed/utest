@@ -1,12 +1,12 @@
-# mbed OS Asynchronous Test Harness
+# Generic C++ Test Harness
 
 This [lest-inspired](https://github.com/martinmoene/lest) test harness allows you to execute a specified series of (asynchronous) C++ test cases with sensible default reporting and useful customization options.
 
-Please note that this is a purposefully lean test harness, only dealing with test execution and providing default reportering handlers. It especially does not support auto-discovery of test cases and does not provide you with test macros or other convenience functions.
+Please note that this is a purposefully lean test harness, only dealing with test execution and providing default reporting handlers. It especially does not support auto-discovery of test cases and does not provide you with test macros or other convenience functions.
 Instead the macros in the [unity module](https://github.com/ARMmbed/unity) can be used for this purpose, however, you are not required to and can use your own macros if you want to.
 
 Be aware that even though this harness currently has to be used with C++03, which makes the test case specification a little more annoying, it is written with C++11 in mind.
-Especially the use of lambda functions will make the specification a lot more simpler.
+Especially the use of lambda functions will make the specification a lot more simpler to write.
 
 Furthermore, test failure recovery via the use of exceptions or `longjmp` is not supported, the test will either continue and ignore failures or die by busy-waiting.
 
@@ -133,9 +133,9 @@ There are five handler types you can, but do not have to, override to customize 
 Please see the `mbed-test-async/types.h` file for a detailed description.
 
 1. `status_t test_set_up_handler_t(const size_t number_of_cases)`: is called before execution of any test case
-1. `void test_tear_down_handler_t(const size_t passed, const size_t failed, const failure_t failure)`: is called after execution of all test case
+1. `void test_tear_down_handler_t(const size_t passed, const size_t failed, const failure_t failure)`: is called after execution of all test cases, and if testing is aborted
 1. `status_t case_set_up_handler_t(const Case *const source, const size_t index_of_case)`: is called before execution of each test case
-1. `status_t case_tear_down_handler_t(const Case *const source, const size_t passed, const size_t failed, const failure_t reason)`: is called after execution of each test case
+1. `status_t case_tear_down_handler_t(const Case *const source, const size_t passed, const size_t failed, const failure_t reason)`: is called after execution of each test case, and if testing is aborted
 1. `status_t case_failure_handler_t(const Case *const source, const failure_t reason)`: is called whenever a failure occurred
 
 All handlers are defaulted for integration with the [Greentea testing automation framework](https://github.com/ARMmbed/greentea).
@@ -144,15 +144,18 @@ All handlers are defaulted for integration with the [Greentea testing automation
 
 There are two test case handlers:
 
-1. `void case_handler_t(void)`: Executes once, if setup succeeded,
-1. `control_flow_t case_control_flow_handler_t(const size_t repeat_count)`: Executes as many times as you specify.
+1. `void case_handler_t(void)`: Executes once, if the case setup succeeded,
+1. `control_flow_t case_control_flow_handler_t(const size_t repeat_count)`: Executes as many times as you specify, if the case setup succeeded.
 
-Returning `CONTROL_FLOW_REPEAT` from your test case handler tells the test harness to repeat the test handler. You can use the `repeat_count` to decide when to stop. Please note that the setup and teardown handlers will not be called on repeated test cases!
+Returning `CONTROL_FLOW_REPEAT` from your test case handler tells the test harness to repeat the test handler. You can use the `repeat_count` (starts counting at zero) to decide when to stop. Please note that the setup and teardown handlers will not be called on repeated test cases!
 
 To specify a test case you must wrap it into a `Case` class: `Case("mandatory description", case_handler)`. You may override the setup, teardown and failure handlers in this wrapper class as well.
 
 For asynchronous test cases, you must use the `AsyncCase` class and specify a timeout: `AsyncCase("mandatory description", case_handler, 200)`.
 To validate your callback, you must call `Harness::validate_callback()` in your asynchronous callback before the timeout fires.
+
+Keep in mind that you can only validate a callback once. If you need to wait for several callbacks, you need to write your own helper function that validates the expected callback only when all your custom callbacks arrived.
+Such highly custom functionality is purposefully not part of this test harness, but can be achieved externally with additional user code.
 
 ### Failure Handlers
 
@@ -166,7 +169,7 @@ When waiting for an asynchronous callback and the timeout fired, as `FAILURE_TIM
 
 The failure handler decides whether to continue or abort testing, by returning `STATUS_CONTINUE` or `STATUS_ABORT` respectively.
 In case of an abort, the test harness dies by busy waiting in a loop forever.
-This is required, since we cannot unwind the stack without exception support, and the asynchronous nature of the test harness breaks with `longjmp`s.
+This is required, since we cannot unwind the stack without exception support, and the asynchronous nature of the test harness breaks with using `longjmp`s effectively.
 
 ### Default Handlers
 
@@ -178,7 +181,13 @@ Three sets of default handlers with different behaviors are provided for your co
 
 These default handlers are called when you have not overridden a custom handler, and they only contain reporting functionality and do not modify global state.
 
-You can specify which default handlers you want to use when wrapping you test cases in the `Specification` class.
+You can specify which default handlers you want to use when wrapping you test cases in the `Specification` class:
+
+```cpp
+// declare you test specification with a custom setup handler
+// and greentea continue default handlers
+Specification specification(greentea_setup, cases, greentea_continue_handlers);
+```
 
 ### Custom Handlers
 
@@ -188,11 +197,12 @@ To ignore a handler completely and not call a custom or default handler, you may
 To explicitly invoke the default handler, use the `default_handler` hint.
 
 To use you own custom handler, provide a function with the correct signature for the handler that you want to customize and provide it in your test case wrapper or specification wrapper.
-It is strongly recommended that you call the provided `verbose_*` handlers, as they report the current condition in a properly formatted fashion.
+It is strongly recommended that you call the predefined `verbose_*` handlers inside your custom callback, as they report the current condition in a properly formatted fashion.
 
 Note that the `Case`, `AsyncCase` and `Specification` constructors are overloaded to allow you a comfortable declaration of all your callbacks:
 
 For `Case` and `AsyncCase` the order of arguments is:
+
 1. description (required)
 1. setup handler (optional)
 1. test case handler (required)
@@ -201,6 +211,7 @@ For `Case` and `AsyncCase` the order of arguments is:
 1. timeout in ms (required only for `AsyncCase`)
 
 For `Specification` the order of arguments is:
+
 1. test setup handler (optional)
 1. array of test cases (required)
 1. test teardown handler (optional)
