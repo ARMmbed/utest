@@ -82,7 +82,7 @@ status_t greentea_setup(const size_t number_of_cases)
     MBED_HOSTTEST_DESCRIPTION(Basic);
     MBED_HOSTTEST_START("MBED_TEST_GREENTEA_CONTINUE_WITH_UNITY");
 
-    return verbose_test_set_up_handler(number_of_cases);
+    return verbose_test_setup_handler(number_of_cases);
 }
 
 const Case cases[] =

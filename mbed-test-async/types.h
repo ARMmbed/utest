@@ -60,7 +60,7 @@ namespace v0 {
      * @returns You can return `STATUS_ABORT` if you initialization failed and the test teardown handler will
      *          then be called with the `FAILURE_SETUP`.
      */
-    typedef status_t (*test_set_up_handler_t)(const size_t number_of_cases);
+    typedef status_t (*test_setup_handler_t)(const size_t number_of_cases);
 
     /** @brief Test teardown handler.
      *
@@ -75,7 +75,7 @@ namespace v0 {
      * @param   failed  the number of cases with at least one failure
      * @param   failure the reason why this handler was called
      */
-    typedef void (*test_tear_down_handler_t)(const size_t passed, const size_t failed, const failure_t failure);
+    typedef void (*test_teardown_handler_t)(const size_t passed, const size_t failed, const failure_t failure);
 
     /** @brief Test case setup handler.
      *
@@ -88,7 +88,7 @@ namespace v0 {
      *          failure handler with `FAILURE_SETUP` and then the case teardown handler with `FAILURE_SETUP`.
      *          This gives the teardown handler a chance to clean up a failed setup.
      */
-    typedef status_t (*case_set_up_handler_t)(const Case *const source, const size_t index_of_case);
+    typedef status_t (*case_setup_handler_t)(const Case *const source, const size_t index_of_case);
 
     /** @brief Test case handler
      *
@@ -118,7 +118,7 @@ namespace v0 {
      * @returns You can return `STATUS_ABORT` to indicate that your teardown failed, which will call the case
      *          failure handler with `FAILURE_TEARDOWN`.
      */
-    typedef status_t (*case_tear_down_handler_t)(const Case *const source, const size_t passed, const size_t failed, const failure_t reason);
+    typedef status_t (*case_teardown_handler_t)(const Case *const source, const size_t passed, const size_t failed, const failure_t reason);
 
     /** @brief Test case failure handler.
      *

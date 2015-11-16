@@ -42,7 +42,7 @@ status_t greentea_setup(const size_t number_of_cases)
     MBED_HOSTTEST_DESCRIPTION(Basic);
     MBED_HOSTTEST_START("ASYNC_TEST_GREENTEA_ABORT");
 
-    return verbose_test_set_up_handler(number_of_cases);
+    return verbose_test_setup_handler(number_of_cases);
 }
 
 Case cases[] =
