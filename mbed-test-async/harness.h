@@ -37,6 +37,7 @@ namespace v0 {
     {
     public:
         static void run(const Specification specification);
+        static bool is_busy();
 
         static void validate_callback();
         static void raise_failure(failure_t reason);
