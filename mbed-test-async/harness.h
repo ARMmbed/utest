@@ -33,13 +33,26 @@ namespace mbed {
 namespace test {
 namespace v0 {
 
+    /** @brief Test Harness.
+     *
+     * This class runs a test specification for you and calls all required handlers.
+     * The harness executes the test specification in an asynchronous fashion, therefore
+     * `run()` returns immediately.
+     *
+     * @note: In case of an test abort, the harness will busy-wait and never finish.
+     */
     class Harness
     {
     public:
+        /// starts running a test specification
         static void run(const Specification specification);
+        /// @returns true if a test specification is executed
         static bool is_busy();
 
+        /// You need to call this function in the asynchronous callback that you have been waiting for
         static void validate_callback();
+        /// Raising a failure causes the failure to be counted and the failure handler to be called.
+        /// Further action then depends on its return state.
         static void raise_failure(failure_t reason);
 
     protected:

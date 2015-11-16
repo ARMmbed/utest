@@ -34,6 +34,11 @@ namespace v0 {
      *
      * This class simply holds the test cases and allows you to specify default handlers, and
      * override setup and teardown handlers.
+     * The order of arguments is:
+     *  - test setup handler (optional)
+     *  - array of test cases (required)
+     *  - test teardown handler (optional)
+     *  - default handlers (optional)
      */
     class Specification
     {
