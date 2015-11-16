@@ -101,9 +101,10 @@ namespace v0 {
      *
      * This handler is called only if the case setup succeeded and is eventually followed by the test case teardown handler.
      *
+     * @param   repeat_count    starting at `0`, contains the number of times this handler has been called
      * @returns You can return `CONTROL_FLOW_REPEAT` to repeat the same test case again.
      */
-    typedef control_flow_t (*case_control_flow_handler_t)(void);
+    typedef control_flow_t (*case_control_flow_handler_t)(const size_t repeat_count);
 
     /** @brief Test case teardown handler.
      *
