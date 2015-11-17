@@ -67,7 +67,7 @@ namespace v0 {
             repeat(REPEAT_NO_REPEAT), timeout(timeout_ms) {}
 
         control_t &
-        operator|(const control_t &rhs) {
+        operator+(const control_t &rhs) {
             if (repeat == 0 || repeat < rhs.repeat) repeat = rhs.repeat;
             if (timeout == uint32_t(-1) || timeout > rhs.timeout) timeout = rhs.timeout;
             return *this;
