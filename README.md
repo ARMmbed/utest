@@ -145,7 +145,7 @@ All handlers are defaulted for integration with the [Greentea testing automation
 There are two test case handlers:
 
 1. `void case_handler_t(void)`: executes once, if the case setup succeeded.
-1. `control_flow_t case_control_flow_handler_t(const size_t repeat_count)`: executes as many times as you specify, if the case setup succeeded.
+1. `control_flow_t case_repeat_count_handler_t(const size_t repeat_count)`: executes as many times as you specify, if the case setup succeeded.
 
 Returning `CONTROL_FLOW_REPEAT` from your test case handler tells the test harness to repeat the test handler. You can use the `repeat_count` (starts counting at zero) to decide when to stop. Please note that the setup and teardown handlers will not be called on repeated test cases!
 

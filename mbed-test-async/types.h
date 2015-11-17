@@ -28,9 +28,10 @@ namespace mbed {
 namespace test {
 namespace v0 {
 
-    enum control_flow_t {
-        CONTROL_FLOW_NEXT   = 0,    ///< continue with the next test case
-        CONTROL_FLOW_REPEAT,        ///< repeat the current test case
+    enum repeat_t {
+        REPEAT_NO_REPEAT = 0,   ///< continue with the next test case
+        REPEAT_CASE_ONLY,       ///< repeat the current test case without the setup and teardown handlers
+        REPEAT_ALL,             ///< repeat the current test case with the setup and teardown handlers
     };
 
     enum status_t {
@@ -51,6 +52,42 @@ namespace v0 {
 
     /// Stringifies a failure for understandable error messages.
     const char* stringify(failure_t failure);
+
+    struct control_t
+    {
+        control_t() : repeat(REPEAT_NO_REPEAT), timeout(0) {}
+
+        control_t(repeat_t repeat, uint32_t timeout_ms) :
+            repeat(repeat), timeout(timeout_ms) {}
+
+        control_t(repeat_t repeat) :
+            repeat(repeat), timeout(0) {}
+
+        control_t(uint32_t timeout_ms) :
+            repeat(REPEAT_NO_REPEAT), timeout(timeout_ms) {}
+
+        control_t &
+        operator|(const control_t &rhs) {
+            if (repeat == 0 || repeat < rhs.repeat) repeat = rhs.repeat;
+            if (timeout == 0 || timeout < rhs.timeout) timeout = rhs.timeout;
+            return *this;
+        }
+
+    private:
+        repeat_t repeat;
+        uint32_t timeout;
+        friend class Harness;
+    };
+
+    class CaseTimeout : public control_t
+    {
+    public:
+        CaseTimeout(uint32_t timeout_ms) : control_t(REPEAT_NO_REPEAT, timeout_ms) {}
+    };
+
+    const control_t CaseRepeatCaseOnly = control_t(REPEAT_CASE_ONLY);
+    const control_t CaseRepeat = control_t(REPEAT_ALL);
+    const control_t CaseNoRepeat = control_t(REPEAT_NO_REPEAT);
 
     class Case; // forward declaration
 
@@ -100,6 +137,8 @@ namespace v0 {
      */
     typedef void (*case_handler_t)(void);
 
+    typedef control_t (*case_control_handler_t)(void);
+
     /** @brief Test case handler (repeatable)
      *
      * This handler is called only if the case setup succeeded and is eventually followed by the test case teardown handler.
@@ -107,7 +146,7 @@ namespace v0 {
      * @param   repeat_count    starting at `0`, contains the number of times this handler has been called
      * @returns You can return `CONTROL_FLOW_REPEAT` to repeat the same test case again.
      */
-    typedef control_flow_t (*case_control_flow_handler_t)(const size_t repeat_count);
+    typedef control_t (*case_repeat_count_handler_t)(const size_t repeat_count);
 
     /** @brief Test case teardown handler.
      *
