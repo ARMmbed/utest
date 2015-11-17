@@ -55,13 +55,13 @@ namespace v0 {
 
     struct control_t
     {
-        control_t() : repeat(REPEAT_NO_REPEAT), timeout(0) {}
+        control_t() : repeat(REPEAT_NO_REPEAT), timeout(-1) {}
 
         control_t(repeat_t repeat, uint32_t timeout_ms) :
             repeat(repeat), timeout(timeout_ms) {}
 
         control_t(repeat_t repeat) :
-            repeat(repeat), timeout(0) {}
+            repeat(repeat), timeout(-1) {}
 
         control_t(uint32_t timeout_ms) :
             repeat(REPEAT_NO_REPEAT), timeout(timeout_ms) {}
@@ -69,7 +69,7 @@ namespace v0 {
         control_t &
         operator|(const control_t &rhs) {
             if (repeat == 0 || repeat < rhs.repeat) repeat = rhs.repeat;
-            if (timeout == 0 || timeout < rhs.timeout) timeout = rhs.timeout;
+            if (timeout == uint32_t(-1) || timeout > rhs.timeout) timeout = rhs.timeout;
             return *this;
         }
 
