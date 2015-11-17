@@ -20,11 +20,11 @@
 
 using namespace mbed::test::v0;
 
-control_flow_t test_repeat(const size_t repeat_count)
+control_t test_repeat(const size_t repeat_count)
 {
     printf("Called for the %u. time\n", repeat_count+1);
 
-    return (repeat_count < 5) ? CONTROL_FLOW_REPEAT : CONTROL_FLOW_NEXT;
+    return (repeat_count < 5) ? CaseRepeatHandlerOnly : CaseNext;
 }
 
 void test_assert_success()
@@ -38,9 +38,10 @@ void test_assert_fail()
     Harness::raise_failure(FAILURE_ASSERTION);
 }
 
-void test_async_fail()
+control_t test_async_fail()
 {
     printf("not generating an asynchronous callback.\n");
+    return CaseTimeout(200);
 }
 
 void test_async_validate()
@@ -49,10 +50,11 @@ void test_async_validate()
     Harness::validate_callback();
 }
 
-void test_async_success()
+control_t test_async_success()
 {
     printf("generating an asynchronous callback.\n");
     minar::Scheduler::postCallback(test_async_validate).delay(minar::milliseconds(500)).tolerance(0);
+    return CaseTimeout(1000);
 }
 
 void test_async_validate_assert_fail()
@@ -64,9 +66,10 @@ void test_async_validate_assert_fail()
     Harness::validate_callback();
 }
 
-void test_async_callback_assert_fail()
+control_t test_async_callback_assert_fail()
 {
     minar::Scheduler::postCallback(test_async_validate_assert_fail).delay(minar::milliseconds(500)).tolerance(0);
+    return CaseTimeout(1000);
 }
 
 Case cases[] =
@@ -74,9 +77,9 @@ Case cases[] =
     Case("NULL test (fail)", ignore_handler, (case_handler_t)ignore_handler, ignore_handler),
     Case("test repeats (success)", test_repeat),
     Case("test assert (fail)", test_assert_fail),
-    AsyncCase("test async (fail)", test_async_fail, 200),
-    AsyncCase("test async (success)", test_async_success, 1000),
-    AsyncCase("test async callback (fail)", test_async_callback_assert_fail, 1000),
+    Case("test async (fail)", test_async_fail),
+    Case("test async (success)", test_async_success),
+    Case("test async callback (fail)", test_async_callback_assert_fail),
     Case("printf with integer formatting (success)", test_assert_success),
 };
 

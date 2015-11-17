@@ -21,11 +21,11 @@
 
 using namespace mbed::test::v0;
 
-control_flow_t test_repeat(const size_t repeat_count)
+control_t test_repeat(const size_t repeat_count)
 {
     printf("Called for the %u. time\n", repeat_count+1);
 
-    return (repeat_count < 5) ? CONTROL_FLOW_REPEAT : CONTROL_FLOW_NEXT;
+    return (repeat_count < 5) ? CaseRepeatHandlerOnly : CaseNext;
 }
 
 void test_assert_fail()
