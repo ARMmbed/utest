@@ -111,7 +111,7 @@ namespace v0 {
 
         const case_failure_handler_t failure_handler;
 
-        const int32_t timeout_ms;
+        const uint32_t timeout_ms;
 
         friend class Harness;
     };
