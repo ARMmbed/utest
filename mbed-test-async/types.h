@@ -53,6 +53,33 @@ namespace v0 {
     /// Stringifies a failure for understandable error messages.
     const char* stringify(failure_t failure);
 
+    /** @brief Control class for specifying test case attributes
+     *
+     * This class encapsulated control information about test cases which, when returned from
+     * a test case influences the behavior of the test harness.
+     * Instead of using this class directly it is recommended to use the aliases for clearer
+     * semantics:
+     * @code
+     * control_t test_case(const size_t repeat_count) {
+     *     // repeat 5 times for a total of 6 calls
+     *     return (repeat_count < 5) ? CaseRepeat : CaseNext;
+     * }
+     * @endcode
+     *
+     * This class overloads the `+` operator to implement something similiar to saturated arbitration:
+     * - The lower timeout value "wins".
+     * - A more involved repeat "wins" (ie. `ALL` > 'CASE_ONLY' > 'NO_REPEAT').
+     *
+     * You may then add timeouts and repeats together:
+     * @code
+     * control_t test_case(const size_t repeat_count) {
+     *     // repeat 5 times for a total of 6 calls, each with a 500ms asynchronous timeout
+     *     return CaseTimeout(500) + ((repeat_count < 5) ? CaseRepeat : CaseNoRepeat);
+     * }
+     * @endcode
+     *
+     * In the future, more control information may be added transparently and backwards compatible.
+     */
     struct control_t
     {
         control_t() : repeat(REPEAT_NO_REPEAT), timeout(-1) {}
@@ -79,15 +106,16 @@ namespace v0 {
         friend class Harness;
     };
 
-    class CaseTimeout : public control_t
-    {
-    public:
-        CaseTimeout(uint32_t timeout_ms) : control_t(REPEAT_NO_REPEAT, timeout_ms) {}
+    /// @brief Alias class for asynchronous timeout control in milliseconds
+    struct CaseTimeout : public control_t {
+        CaseTimeout(uint32_t ms) : control_t(ms) {}
     };
-
-    const control_t CaseRepeatCaseOnly = control_t(REPEAT_CASE_ONLY);
+    /// @brief repeats only the test case handler without calling teardown and setup handlers
+    const control_t CaseRepeatHandlerOnly = control_t(REPEAT_CASE_ONLY);
+    /// @brief repeats the test case handler with calling teardown and setup handlers
     const control_t CaseRepeat = control_t(REPEAT_ALL);
-    const control_t CaseNoRepeat = control_t(REPEAT_NO_REPEAT);
+    /// @brief does not repeat this test case, but moves on to the next one
+    const control_t CaseNext = control_t(REPEAT_NO_REPEAT);
 
     class Case; // forward declaration
 
@@ -130,13 +158,18 @@ namespace v0 {
      */
     typedef status_t (*case_setup_handler_t)(const Case *const source, const size_t index_of_case);
 
-    /** @brief Test case handler
+    /** @brief Primitive test case handler
      *
      * This handler is called only if the case setup succeeded and is followed by the test case teardown handler.
      * @note This handler is executed only once.
      */
     typedef void (*case_handler_t)(void);
 
+    /** @brief Complex test case handler
+     *
+     * This handler is called only if the case setup succeeded and is followed by the test case teardown handler.
+     * @returns .
+     */
     typedef control_t (*case_control_handler_t)(void);
 
     /** @brief Test case handler (repeatable)
