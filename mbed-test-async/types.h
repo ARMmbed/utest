@@ -49,6 +49,9 @@ namespace v0 {
         FAILURE_ASSERTION,  ///< An assertion failed
     };
 
+    /// Stringifies a failure for understandable error messages.
+    const char* stringify(failure_t failure);
+
     class Case; // forward declaration
 
     /** @brief Test setup handler.
