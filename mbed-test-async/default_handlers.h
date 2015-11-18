@@ -29,7 +29,7 @@ namespace mbed {
 namespace test {
 namespace v0 {
 
-    /** @brief Default handler hint.
+    /** Default handler hint.
      *
      * Use this handler to indicate the you want the default handler to be called.
      * This type automatically casts itself into the appropriate handler type.
@@ -44,7 +44,7 @@ namespace v0 {
         operator case_failure_handler_t()   const { return case_failure_handler_t(1); }
     } default_handler;
 
-    /** @brief Ignore handler hint.
+    /** Ignore handler hint.
      *
      * Use this handler to indicate the you want to ignore this handler and it will not be called.
      * This type automatically casts itself into the appropriate handler type.
@@ -63,7 +63,7 @@ namespace v0 {
         operator case_failure_handler_t()   const { return case_failure_handler_t(NULL); }
     } ignore_handler;
 
-    /** @brief A table of handlers.
+    /** A table of handlers.
      *
      * This structure stores all modifyable handlers and provides accessors to
      * filter out the default handler.

@@ -30,7 +30,7 @@ namespace mbed {
 namespace test {
 namespace v0 {
 
-    /** @brief Test specification containing the setup and teardown handlers and test cases.
+    /** Test specification containing the setup and teardown handlers and test cases.
      *
      * This class simply holds the test cases and allows you to specify default handlers, and
      * override setup and teardown handlers.
@@ -39,6 +39,9 @@ namespace v0 {
      *  - array of test cases (required)
      *  - test teardown handler (optional)
      *  - default handlers (optional)
+     *
+     * @note You cannot set the size of the test case array dynamically, it is template deducted at compile
+     *       time. Creating test specifications for unittests at runtime is explicitly not supported.
      */
     class Specification
     {

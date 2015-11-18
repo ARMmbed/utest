@@ -154,7 +154,7 @@ Returning `CaseRepeat` from your test case handler tells the test harness to rep
 By default the setup and teardown handlers are called on every repeated test cases, however, you may only repeat the case handler by returning `CaseRepeatHandlerOnly`. To stop the harness from repeating the test case, return `CaseNext`.
 
 For asynchronous test cases, you must return a `CaseTimeout(uint32_t ms)`.
-To validate your callback, you must call `Harness::validate_callback()` in your asynchronous callback before the timeout fires.
+To validate your callback, you must call `Harness::validate_callback()` in your asynchronous callback before the timeout fires. This will schedule the
 
 For repeating asynchronous cases, you can "add" both modifiers together: `CaseTimeout(200) + CaseRepeat` will repeat the test case after a max. of 200ms.
 Note that when adding conflicting modifiers together
@@ -227,3 +227,16 @@ For `Specification` the order of arguments is:
 1. Array of test cases (required).
 1. Test teardown handler (optional).
 1. Default handlers (optional).
+
+### Atomicity
+
+**All handlers execute with interrupts disabled!**
+
+This is so that an interrupt validating its callback using `Harness::validate_callback()` does not fire before the harness even knows that it is expecting a callback.
+
+This means you cannot and should not write tests that expect interrupts to happen within the test case handler.
+Even though you can still poll for an interrupt flag, it is not recommended, since the harness cannot preempt the handlers.
+So when you are busy-waiting for an interrupt flag to be set, you disallow the harness to raise a timeout failure
+which would provide you with a meaningful message.
+
+Please use the asynchronous callback functionality for this!

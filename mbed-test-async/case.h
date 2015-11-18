@@ -29,7 +29,7 @@ namespace mbed {
 namespace test {
 namespace v0 {
 
-    /** @brief Test case wrapper class.
+    /** Test case wrapper class.
      *
      * This class contains the description of the test case and all handlers
      * for setting up, running the test case, tearing down and handling failures.
@@ -102,11 +102,11 @@ namespace v0 {
             const case_failure_handler_t failure_handler = default_handler);
 
 
-        const char*
-        get_description() const;
+        /// @returns the textual description of the test case
+        const char* get_description() const;
 
-        bool
-        is_empty() const;
+        /// @returns `true` if setup, test and teardown handlers are set to `ignore_handler`
+        bool is_empty() const;
 
     private:
         const char *description;
