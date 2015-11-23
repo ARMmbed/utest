@@ -25,8 +25,7 @@
 #include "types.h"
 
 
-namespace mbed {
-namespace test {
+namespace utest {
 namespace v0 {
 
     /** Default handler hint.
@@ -167,8 +166,8 @@ namespace v0 {
 
     /// The greentea aborting handlers are the default
     const handlers_t default_handlers = greentea_abort_handlers;
-}
-}
-}
+
+}   // namespace v0
+}   // namespace utest
 
 #endif // MBED_TEST_ASYNC_DEFAULT_HANDLER_H

@@ -29,8 +29,7 @@
 #include "specification.h"
 
 
-namespace mbed {
-namespace test {
+namespace utest {
 namespace v0 {
 
     /** Test Harness.
@@ -68,8 +67,7 @@ namespace v0 {
         static void schedule_next_case();
     };
 
-}
-}
-}
+}   // namespace v0
+}   // namespace utest
 
 #endif // MBED_TEST_ASYNC_HARNESS_H

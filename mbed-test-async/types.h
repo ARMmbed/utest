@@ -24,8 +24,7 @@
 #include <stdio.h>
 
 
-namespace mbed {
-namespace test {
+namespace utest {
 namespace v0 {
 
     enum repeat_t {
@@ -221,8 +220,7 @@ namespace v0 {
      */
     typedef status_t (*case_failure_handler_t)(const Case *const source, const failure_t reason);
 
-}
-}
-}
+}   // namespace v0
+}   // namespace utest
 
 #endif // MBED_TEST_ASYNC_TYPES_H

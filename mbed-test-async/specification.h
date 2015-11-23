@@ -26,8 +26,8 @@
 #include "case.h"
 #include "default_handlers.h"
 
-namespace mbed {
-namespace test {
+
+namespace utest {
 namespace v0 {
 
     /** Test specification containing the setup and teardown handlers and test cases.
@@ -91,8 +91,7 @@ namespace v0 {
         friend class Harness;
     };
 
-}
-}
-}
+}   // namespace v0
+}   // namespace utest
 
  #endif // MBED_TEST_ASYNC_SPECIFICATION_H
