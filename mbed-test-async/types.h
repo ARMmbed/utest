@@ -28,9 +28,10 @@ namespace mbed {
 namespace test {
 namespace v0 {
 
-    enum control_flow_t {
-        CONTROL_FLOW_NEXT   = 0,    ///< continue with the next test case
-        CONTROL_FLOW_REPEAT,        ///< repeat the current test case
+    enum repeat_t {
+        REPEAT_NO_REPEAT = 0,   ///< continue with the next test case
+        REPEAT_CASE_ONLY,       ///< repeat the current test case without the setup and teardown handlers
+        REPEAT_ALL,             ///< repeat the current test case with the setup and teardown handlers
     };
 
     enum status_t {
@@ -52,20 +53,86 @@ namespace v0 {
     /// Stringifies a failure for understandable error messages.
     const char* stringify(failure_t failure);
 
+    /** Control class for specifying test case attributes
+     *
+     * This class encapsulated control information about test cases which, when returned from
+     * a test case influences the behavior of the test harness.
+     * Instead of using this class directly it is recommended to use the aliases for clearer
+     * semantics:
+     * @code
+     * control_t test_case(const size_t repeat_count) {
+     *     // repeat 5 times for a total of 6 calls
+     *     return (repeat_count < 5) ? CaseRepeat : CaseNext;
+     * }
+     * @endcode
+     *
+     * This class overloads the `+` operator to implement something similiar to saturated arbitration:
+     * - The lower timeout value "wins".
+     * - A more involved repeat "wins" (ie. `ALL` > 'CASE_ONLY' > 'NO_REPEAT').
+     *
+     * You may then add timeouts and repeats together:
+     * @code
+     * control_t test_case(const size_t repeat_count) {
+     *     // repeat 5 times for a total of 6 calls, each with a 500ms asynchronous timeout
+     *     return CaseTimeout(500) + ((repeat_count < 5) ? CaseRepeat : CaseNoRepeat);
+     * }
+     * @endcode
+     *
+     * In the future, more control information may be added transparently and backwards compatible.
+     */
+    struct control_t
+    {
+        control_t() : repeat(REPEAT_NO_REPEAT), timeout(-1) {}
+
+        control_t(repeat_t repeat, uint32_t timeout_ms) :
+            repeat(repeat), timeout(timeout_ms) {}
+
+        control_t(repeat_t repeat) :
+            repeat(repeat), timeout(-1) {}
+
+        control_t(uint32_t timeout_ms) :
+            repeat(REPEAT_NO_REPEAT), timeout(timeout_ms) {}
+
+        control_t &
+        operator+(const control_t &rhs) {
+            if (repeat == 0 || repeat < rhs.repeat) repeat = rhs.repeat;
+            if (timeout == uint32_t(-1) || timeout > rhs.timeout) timeout = rhs.timeout;
+            return *this;
+        }
+
+    private:
+        repeat_t repeat;
+        uint32_t timeout;
+        friend class Harness;
+    };
+
+    /// Alias class for asynchronous timeout control in milliseconds
+    struct CaseTimeout : public control_t {
+        CaseTimeout(uint32_t ms) : control_t(ms) {}
+    };
+    /// repeats only the test case handler without calling teardown and setup handlers
+    const control_t CaseRepeatHandlerOnly = control_t(REPEAT_CASE_ONLY);
+    /// repeats the test case handler with calling teardown and setup handlers
+    const control_t CaseRepeat = control_t(REPEAT_ALL);
+    /// does not repeat this test case, but moves on to the next one
+    const control_t CaseNext = control_t(REPEAT_NO_REPEAT);
+
     class Case; // forward declaration
 
-    /** @brief Test setup handler.
+    /** Test setup handler.
      *
      * This handler is called before execution of any test case and
      * allows you to initialize your common test environment.
      *
      * @param   number_of_cases the total number of test cases in the test specification
-     * @returns You can return `STATUS_ABORT` if you initialization failed and the test teardown handler will
-     *          then be called with the `FAILURE_SETUP`.
+     *
+     * @returns
+     *    You can return `STATUS_ABORT` if you initialization failed and the test teardown handler will
+     *    then be called with the `FAILURE_SETUP`.
      */
     typedef status_t (*test_setup_handler_t)(const size_t number_of_cases);
 
-    /** @brief Test teardown handler.
+    /** Test teardown handler.
      *
      * This handler is called after execution of all test case or if test execution is aborted.
      * You can use this handler to de-initialize your test environment and output test statistics.
@@ -80,36 +147,52 @@ namespace v0 {
      */
     typedef void (*test_teardown_handler_t)(const size_t passed, const size_t failed, const failure_t failure);
 
-    /** @brief Test case setup handler.
+    /** Test case setup handler.
      *
      * This handler is called before execution of each test case and
      * allows you to modify your environment before each test case.
      *
      * @param   source          the test case to be setup
      * @param   index_of_case   the current index of the test case within the specification
-     * @returns You can return `STATUS_ABORT` to indicate that your setup failed, which will call the case
-     *          failure handler with `FAILURE_SETUP` and then the case teardown handler with `FAILURE_SETUP`.
-     *          This gives the teardown handler a chance to clean up a failed setup.
+     *
+     * @returns
+     *    You can return `STATUS_ABORT` to indicate that your setup failed, which will call the case
+     *    failure handler with `FAILURE_SETUP` and then the case teardown handler with `FAILURE_SETUP`.
+     *    This gives the teardown handler a chance to clean up a failed setup.
      */
     typedef status_t (*case_setup_handler_t)(const Case *const source, const size_t index_of_case);
 
-    /** @brief Test case handler
+    /** Primitive test case handler
      *
      * This handler is called only if the case setup succeeded and is followed by the test case teardown handler.
+     *
      * @note This handler is executed only once.
      */
     typedef void (*case_handler_t)(void);
 
-    /** @brief Test case handler (repeatable)
+    /** Complex test case handler
      *
-     * This handler is called only if the case setup succeeded and is eventually followed by the test case teardown handler.
+     * This handler is called only if the case setup succeeded and then may be repeated or
+     * awaiting a asynchronous callback, depending on the return modifiers.
+     *
+     * @returns
+     *    A combination of control modifiers.
+     */
+    typedef control_t (*case_control_handler_t)(void);
+
+    /** Test case handler (repeatable)
+     *
+     * This handler is called only if the case setup succeeded and then may be repeated or
+     * awaiting a asynchronous callback, depending on the return modifiers.
      *
      * @param   repeat_count    starting at `0`, contains the number of times this handler has been called
-     * @returns You can return `CONTROL_FLOW_REPEAT` to repeat the same test case again.
+     *
+     * @returns
+     *    A combination of control modifiers.
      */
-    typedef control_flow_t (*case_control_flow_handler_t)(const size_t repeat_count);
+    typedef control_t (*case_repeat_count_handler_t)(const size_t repeat_count);
 
-    /** @brief Test case teardown handler.
+    /** Test case teardown handler.
      *
      * This handler is called after execution of each test case or all repeated test cases and
      * allows you to reset your environment after each test case.
@@ -118,19 +201,23 @@ namespace v0 {
      * @param   passed  the number of cases without failures (can be >1 for repeated test cases)
      * @param   failed  the number failures (can be larger than the number of (repeated) test cases)
      * @param   failure the reason why this handler was called
-     * @returns You can return `STATUS_ABORT` to indicate that your teardown failed, which will call the case
-     *          failure handler with `FAILURE_TEARDOWN`.
+     *
+     * @returns
+     *    You can return `STATUS_ABORT` to indicate that your teardown failed, which will call the case
+     *    failure handler with `FAILURE_TEARDOWN`.
      */
     typedef status_t (*case_teardown_handler_t)(const Case *const source, const size_t passed, const size_t failed, const failure_t reason);
 
-    /** @brief Test case failure handler.
+    /** Test case failure handler.
      *
      * This handler is called whenever a failure occurred during the setup, execution or teardown.
      *
      * @param   source  the test case in which the failure occurred
      * @param   reason the reason why this handler was called
-     * @returns You can return `STATUS_ABORT` to indicate that this failure is non-recoverable, which will call the
-     *          case teardown handler with reason. If a failure occurs during teardown, the teardown will not be called again.
+     *
+     * @returns
+     *    You can return `STATUS_ABORT` to indicate that this failure is non-recoverable, which will call the case
+     *    teardown handler with reason. If a failure occurs during teardown, the teardown will not be called again.
      */
     typedef status_t (*case_failure_handler_t)(const Case *const source, const failure_t reason);
 

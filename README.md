@@ -48,11 +48,11 @@ status_t test_repeats_setup(const Case *const source, const size_t index_of_case
     printf("Setting up for '%s'\n", source->get_description());
     return status;
 }
-control_flow_t test_repeats(const size_t repeat_count) {
+control_t test_repeats(const size_t repeat_count) {
     printf("Called for the %u. time\n", repeat_count+1);
     TEST_ASSERT_NOT_EQUAL(repeat_count, 6);
     // Specify how often this test is repeated ie. (n + 1) total calls
-    return (repeat_count < 5) ? CONTROL_FLOW_REPEAT : CONTROL_FLOW_NEXT;
+    return (repeat_count < 5) ? CaseRepeat : CaseNext;
 }
 
 void test_callback_validate() {
@@ -61,10 +61,12 @@ void test_callback_validate() {
     // Validate the callback
     Harness::validate_callback();
 }
-void test_asynchronous() {
+control_t test_asynchronous() {
     TEST_ASSERT_MESSAGE(true, "(true == false) o_O");
     // Set up a callback in the future. This may also be an interrupt!
     minar::Scheduler::postCallback(test_callback_validate).delay(minar::milliseconds(100));
+    // Set a 200ms timeout starting from now
+    return CaseTimeout(200);
 }
 
 // Custom setup handler required for proper Greentea support
@@ -81,7 +83,7 @@ status_t greentea_setup(const size_t number_of_cases) {
 Case cases[] = {
     Case("Simple Test", test_simple),
     Case("Repeating Test (6x)", test_repeats_setup, test_repeats),
-    AsyncCase("Asynchronous Test (200ms timeout)", test_asynchronous, 200)
+    Case("Asynchronous Test (200ms timeout)", test_asynchronous)
 };
 
 // Declare your test specification with a custom setup handler
@@ -142,17 +144,25 @@ All handlers are defaulted for integration with the [Greentea testing automation
 
 ### Test Case Handlers
 
-There are two test case handlers:
+There are three test case handlers:
 
 1. `void case_handler_t(void)`: executes once, if the case setup succeeded.
-1. `control_flow_t case_control_flow_handler_t(const size_t repeat_count)`: executes as many times as you specify, if the case setup succeeded.
+1. `control_t case_control_handler_t(void)`: executes (asynchronously) as many times as you specify, if the case setup succeeded.
+1. `control_t case_repeat_count_handler_t(const size_t repeat_count)`: executes (asynchronously) as many times as you specify, if the case setup succeeded.
 
-Returning `CONTROL_FLOW_REPEAT` from your test case handler tells the test harness to repeat the test handler. You can use the `repeat_count` (starts counting at zero) to decide when to stop. Please note that the setup and teardown handlers will not be called on repeated test cases!
+Returning `CaseRepeat` from your test case handler tells the test harness to repeat the test handler. You can use the `repeat_count` (starts counting at zero) to decide when to stop.
+By default the setup and teardown handlers are called on every repeated test cases, however, you may only repeat the case handler by returning `CaseRepeatHandlerOnly`. To stop the harness from repeating the test case, return `CaseNext`.
+
+For asynchronous test cases, you must return a `CaseTimeout(uint32_t ms)`.
+To validate your callback, you must call `Harness::validate_callback()` in your asynchronous callback before the timeout fires. This will schedule the
+
+For repeating asynchronous cases, you can "add" both modifiers together: `CaseTimeout(200) + CaseRepeat` will repeat the test case after a max. of 200ms.
+Note that when adding conflicting modifiers together
+
+- the more restrictive timeout is chosen.
+- the more invasive repeat method is chosen: `CaseRepeat` > `CaseRepeatHandlerOnly` > `CaseNext`.
 
 To specify a test case you must wrap it into a `Case` class: `Case("mandatory description", case_handler)`. You may override the setup, teardown and failure handlers in this wrapper class as well.
-
-For asynchronous test cases, you must use the `AsyncCase` class and specify a timeout: `AsyncCase("mandatory description", case_handler, 200)`.
-To validate your callback, you must call `Harness::validate_callback()` in your asynchronous callback before the timeout fires.
 
 Keep in mind that you can only validate a callback once. If you need to wait for several callbacks, you need to write your own helper function that validates the expected callback only when all your custom callbacks arrive.
 This custom functionality is purposefully not part of this test harness, you can achieve it externally with additional code.
@@ -197,18 +207,19 @@ To ignore a handler completely and not call a custom or default handler, you may
 To explicitly invoke the default handler, use the `default_handler` hint.
 
 To use your own custom handler, provide a function with the correct signature for the handler that you want to customize and provide it in your test case wrapper or specification wrapper.
-We strongly recommend that you call the predefined `verbose_*` handlers inside your custom callback, as they report the current condition in a properly formatted fashion.
+To turn a `failure_t` into a meaningful string use the `stringify(failure_t)` method.
 
-Note that the `Case`, `AsyncCase` and `Specification` constructors are overloaded to allow you a comfortable declaration of all your callbacks.
+**We strongly recommend that you call the predefined `verbose_*` handlers inside your custom callback, as they report the current condition in a properly formatted fashion.**
 
-For `Case` and `AsyncCase` the order of arguments is:
+Note that the `Case` and `Specification` constructors are overloaded to allow you a comfortable declaration of all your callbacks.
+
+For `Case` the order of arguments is:
 
 1. Description (required).
 1. Setup handler (optional).
 1. Test case handler (required).
 1. Teardown handler (optional).
 1. Failure handler (optional).
-1. Timeout in ms (required only for `AsyncCase`).
 
 For `Specification` the order of arguments is:
 
@@ -216,3 +227,16 @@ For `Specification` the order of arguments is:
 1. Array of test cases (required).
 1. Test teardown handler (optional).
 1. Default handlers (optional).
+
+### Atomicity
+
+**All handlers execute with interrupts disabled!**
+
+This is so that an interrupt validating its callback using `Harness::validate_callback()` does not fire before the harness even knows that it is expecting a callback.
+
+This means you cannot and should not write tests that expect interrupts to happen within the test case handler.
+Even though you can still poll for an interrupt flag, it is not recommended, since the harness cannot preempt the handlers.
+So when you are busy-waiting for an interrupt flag to be set, you disallow the harness to raise a timeout failure
+which would provide you with a meaningful message.
+
+Please use the asynchronous callback functionality for this!

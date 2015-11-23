@@ -29,7 +29,7 @@ namespace mbed {
 namespace test {
 namespace v0 {
 
-    /** @brief Test case wrapper class.
+    /** Test case wrapper class.
      *
      * This class contains the description of the test case and all handlers
      * for setting up, running the test case, tearing down and handling failures.
@@ -53,6 +53,7 @@ namespace v0 {
     class Case
     {
     public:
+        // overloads for case_handler_t
         Case(const char *description,
              const case_setup_handler_t setup_handler,
              const case_handler_t case_handler,
@@ -68,170 +69,60 @@ namespace v0 {
              const case_teardown_handler_t teardown_handler,
              const case_failure_handler_t failure_handler = default_handler);
 
+        // overloads for case_control_handler_t
+        Case(const char *description,
+             const case_setup_handler_t setup_handler,
+             const case_control_handler_t case_handler,
+             const case_teardown_handler_t teardown_handler = default_handler,
+             const case_failure_handler_t failure_handler = default_handler);
 
         Case(const char *description,
+             const case_control_handler_t case_handler,
+             const case_failure_handler_t failure_handler = default_handler);
+
+        Case(const char *description,
+             const case_control_handler_t case_handler,
+             const case_teardown_handler_t teardown_handler,
+             const case_failure_handler_t failure_handler = default_handler);
+
+        // overloads for case_repeat_count_handler_t
+        Case(const char *description,
             const case_setup_handler_t setup_handler,
-            const case_control_flow_handler_t case_handler,
+            const case_repeat_count_handler_t case_handler,
             const case_teardown_handler_t teardown_handler = default_handler,
             const case_failure_handler_t failure_handler = default_handler);
 
         Case(const char *description,
-            const case_control_flow_handler_t case_handler,
+            const case_repeat_count_handler_t case_handler,
             const case_failure_handler_t failure_handler = default_handler);
 
         Case(const char *description,
-            const case_control_flow_handler_t case_handler,
+            const case_repeat_count_handler_t case_handler,
             const case_teardown_handler_t teardown_handler,
             const case_failure_handler_t failure_handler = default_handler);
 
 
-        const char*
-        get_description() const;
+        /// @returns the textual description of the test case
+        const char* get_description() const;
 
-        bool
-        is_empty() const;
-
-    protected:
-        Case(const char *description,
-             const case_setup_handler_t setup_handler,
-             const case_handler_t case_handler,
-             const case_control_flow_handler_t control_flow_handler,
-             const case_teardown_handler_t teardown_handler,
-             const case_failure_handler_t failure_handler,
-             const int32_t timeout_ms);
+        /// @returns `true` if setup, test and teardown handlers are set to `ignore_handler`
+        bool is_empty() const;
 
     private:
         const char *description;
 
         const case_handler_t handler;
-        const case_control_flow_handler_t control_flow_handler;
+        const case_control_handler_t control_handler;
+        const case_repeat_count_handler_t repeat_count_handler;
 
         const case_setup_handler_t setup_handler;
         const case_teardown_handler_t teardown_handler;
 
         const case_failure_handler_t failure_handler;
 
-        const uint32_t timeout_ms;
-
         friend class Harness;
     };
 
-    /** @brief Test case wrapper class for asynchronous calls.
-     *
-     * This class only expands on the base class by including a timeout (in milliseconds)
-     * after which the test is declared as failed.
-     * You need to call `Harness::validate_callback();` to cancel the timeout.
-     *
-     * These constructors are overloaded to allow you a comfortable declaration of all your
-     * callbacks.
-     * The order is always:
-     *  - description (required)
-     *  - setup handler (optional)
-     *  - test case handler (required)
-     *  - teardown handler (optional)
-     *  - failure handler (optional)
-     *  - timeout in ms (required)
-     */
-    class AsyncCase : public Case
-    {
-        friend class Harness;
-
-    public:
-        AsyncCase(const char *description,
-                  const case_handler_t case_handler,
-                  const uint32_t timeout_ms);
-
-        AsyncCase(const char *description,
-                  const case_setup_handler_t setup_handler,
-                  const case_handler_t case_handler,
-                  const uint32_t timeout_ms);
-
-
-        AsyncCase(const char *description,
-                  const case_handler_t case_handler,
-                  const case_teardown_handler_t teardown_handler,
-                  const uint32_t timeout_ms);
-
-        AsyncCase(const char *description,
-                  const case_setup_handler_t setup_handler,
-                  const case_handler_t case_handler,
-                  const case_teardown_handler_t teardown_handler,
-                  const uint32_t timeout_ms);
-
-
-        AsyncCase(const char *description,
-                  const case_handler_t case_handler,
-                  const case_failure_handler_t failure_handler,
-                  const uint32_t timeout_ms);
-
-        AsyncCase(const char *description,
-                  const case_setup_handler_t setup_handler,
-                  const case_handler_t case_handler,
-                  const case_failure_handler_t failure_handler,
-                  const uint32_t timeout_ms);
-
-
-        AsyncCase(const char *description,
-                  const case_handler_t case_handler,
-                  const case_teardown_handler_t teardown_handler,
-                  const case_failure_handler_t failure_handler,
-                  const uint32_t timeout_ms);
-
-        AsyncCase(const char *description,
-                  const case_setup_handler_t setup_handler,
-                  const case_handler_t case_handler,
-                  const case_teardown_handler_t teardown_handler,
-                  const case_failure_handler_t failure_handler,
-                  const uint32_t timeout_ms);
-
-    public:
-        AsyncCase(const char *description,
-                  const case_control_flow_handler_t case_handler,
-                  const uint32_t timeout_ms);
-
-        AsyncCase(const char *description,
-                  const case_setup_handler_t setup_handler,
-                  const case_control_flow_handler_t case_handler,
-                  const uint32_t timeout_ms);
-
-
-        AsyncCase(const char *description,
-                  const case_control_flow_handler_t case_handler,
-                  const case_teardown_handler_t teardown_handler,
-                  const uint32_t timeout_ms);
-
-        AsyncCase(const char *description,
-                  const case_setup_handler_t setup_handler,
-                  const case_control_flow_handler_t case_handler,
-                  const case_teardown_handler_t teardown_handler,
-                  const uint32_t timeout_ms);
-
-
-        AsyncCase(const char *description,
-                  const case_control_flow_handler_t case_handler,
-                  const case_failure_handler_t failure_handler,
-                  const uint32_t timeout_ms);
-
-        AsyncCase(const char *description,
-                  const case_setup_handler_t setup_handler,
-                  const case_control_flow_handler_t case_handler,
-                  const case_failure_handler_t failure_handler,
-                  const uint32_t timeout_ms);
-
-
-        AsyncCase(const char *description,
-                  const case_control_flow_handler_t case_handler,
-                  const case_teardown_handler_t teardown_handler,
-                  const case_failure_handler_t failure_handler,
-                  const uint32_t timeout_ms);
-
-        AsyncCase(const char *description,
-                  const case_setup_handler_t setup_handler,
-                  const case_control_flow_handler_t case_handler,
-                  const case_teardown_handler_t teardown_handler,
-                  const case_failure_handler_t failure_handler,
-                  const uint32_t timeout_ms);
-    };
 }
 }
 }

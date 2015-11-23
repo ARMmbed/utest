@@ -29,7 +29,7 @@ namespace mbed {
 namespace test {
 namespace v0 {
 
-    /** @brief Default handler hint.
+    /** Default handler hint.
      *
      * Use this handler to indicate the you want the default handler to be called.
      * This type automatically casts itself into the appropriate handler type.
@@ -44,7 +44,7 @@ namespace v0 {
         operator case_failure_handler_t()   const { return case_failure_handler_t(1); }
     } default_handler;
 
-    /** @brief Ignore handler hint.
+    /** Ignore handler hint.
      *
      * Use this handler to indicate the you want to ignore this handler and it will not be called.
      * This type automatically casts itself into the appropriate handler type.
@@ -52,7 +52,8 @@ namespace v0 {
     const struct
     {
         operator case_handler_t()              const { return case_handler_t(NULL); }
-        operator case_control_flow_handler_t() const { return case_control_flow_handler_t(NULL); }
+        operator case_control_handler_t()      const { return case_control_handler_t(NULL); }
+        operator case_repeat_count_handler_t() const { return case_repeat_count_handler_t(NULL); }
 
         operator test_setup_handler_t()    const { return test_setup_handler_t(NULL); }
         operator test_teardown_handler_t() const { return test_teardown_handler_t(NULL); }
@@ -62,7 +63,7 @@ namespace v0 {
         operator case_failure_handler_t()   const { return case_failure_handler_t(NULL); }
     } ignore_handler;
 
-    /** @brief A table of handlers.
+    /** A table of handlers.
      *
      * This structure stores all modifyable handlers and provides accessors to
      * filter out the default handler.
@@ -126,7 +127,7 @@ namespace v0 {
     /// Prints the number of tests that passed and failed with a reason if provided within this case and continues.
     status_t verbose_case_teardown_handler(const Case *const source, const size_t passed, const size_t failed, const failure_t failure);
     /// Prints the reason of the failure and continues, unless the teardown handler failed, for which it aborts.
-    status_t verbose_case_failure_handler  (const Case *const source, const failure_t reason);
+    status_t verbose_case_failure_handler (const Case *const source, const failure_t reason);
 
     /// Prints a helpful error message and aborts.
     /// This function **NEEDS** to be overridden by the user when using greentea.
@@ -135,7 +136,7 @@ namespace v0 {
     void     greentea_test_teardown_handler(const size_t passed, const size_t failed, const failure_t failure);
 
     /// Calls `verbose_case_failure_handler` but then aborts.
-    status_t greentea_case_failure_handler  (const Case *const source, const failure_t reason);
+    status_t greentea_case_failure_handler (const Case *const source, const failure_t reason);
 
     /// The verbose default handlers that always continue on failure
     const handlers_t verbose_continue_handlers = {
