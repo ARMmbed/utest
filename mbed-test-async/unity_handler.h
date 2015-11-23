@@ -22,6 +22,6 @@
 #include <stdint.h>
 
 /// this function is called from the unity module when an assertion failed.
-void mbed_test_unity_assert_failure();
+void utest_unity_assert_failure();
 
 #endif // MBED_ASYNC_TEST_UNITY_ASSERT_FAILURE_H
