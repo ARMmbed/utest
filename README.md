@@ -1,4 +1,4 @@
-# Generic C++ Test Harness
+# utest: A Simple C++ Test Harness
 
 This [lest-inspired](https://github.com/martinmoene/lest) test harness allows you to execute a specified series of (asynchronous) C++ test cases with sensible default reporting and useful customization options.
 
