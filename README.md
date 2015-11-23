@@ -32,7 +32,7 @@ The following example showcases a lot of functionality and proper integration wi
 
 ```cpp
 #include "mbed-drivers/test_env.h"
-#include "mbed-test-async/test.h"
+#include "mbed-test-async/utest.h"
 #include "unity/unity.h"
 
 using namespace mbed::test::v0;

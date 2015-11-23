@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 #include "mbed-drivers/mbed.h"
-#include "mbed-test-async/test.h"
+#include "mbed-test-async/utest.h"
 #include "mbed-drivers/test_env.h"
 
 
