@@ -16,7 +16,7 @@
  */
 #include "mbed-drivers/mbed.h"
 #include "mbed-drivers/test_env.h"
-#include "mbed-test-async/utest.h"
+#include "utest/utest.h"
 #include "unity/unity.h"
 
 

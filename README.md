@@ -32,7 +32,7 @@ The following example showcases a lot of functionality and proper integration wi
 
 ```cpp
 #include "mbed-drivers/test_env.h"
-#include "mbed-test-async/utest.h"
+#include "utest/utest.h"
 #include "unity/unity.h"
 
 using namespace utest::v0;
@@ -132,7 +132,7 @@ Called for the 6. time
 ### Handlers
 
 There are five handler types you can, but do not have to, override to customize operation.
-Please see the `mbed-test-async/types.h` file for a detailed description.
+Please see the `utest/types.h` file for a detailed description.
 
 1. `status_t test_setup_handler_t(const size_t number_of_cases)`: called before execution of any test case.
 1. `void test_teardown_handler_t(const size_t passed, const size_t failed, const failure_t failure)`: called after execution of all test cases, and if testing is aborted.
