@@ -16,9 +16,9 @@
  ****************************************************************************
  */
 
- #include "mbed-test-async/types.h"
+ #include "utest/types.h"
 
-const char* mbed::test::v0::stringify(mbed::test::v0::failure_t failure)
+const char* utest::v0::stringify(utest::v0::failure_t failure)
 {
     switch(failure)
     {

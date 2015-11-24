@@ -16,9 +16,9 @@
  ****************************************************************************
  */
 
- #include "mbed-test-async/case.h"
+ #include "utest/case.h"
 
-using namespace mbed::test::v0;
+using namespace utest::v0;
 
 // normal handler
 Case::Case(const char *description,

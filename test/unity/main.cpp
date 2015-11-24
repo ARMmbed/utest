@@ -16,11 +16,11 @@
  */
 #include "mbed-drivers/mbed.h"
 #include "mbed-drivers/test_env.h"
-#include "mbed-test-async/test.h"
+#include "utest/utest.h"
 #include "unity/unity.h"
 
 
-using namespace mbed::test::v0;
+using namespace utest::v0;
 
 control_t test_repeat(const size_t repeat_count)
 {

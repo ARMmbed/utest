@@ -16,8 +16,8 @@
  ****************************************************************************
  */
 
-#ifndef MBED_TEST_ASYNC_CASES_H
-#define MBED_TEST_ASYNC_CASES_H
+#ifndef UTEST_CASES_H
+#define UTEST_CASES_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -25,8 +25,8 @@
 #include "types.h"
 #include "default_handlers.h"
 
-namespace mbed {
-namespace test {
+
+namespace utest {
 namespace v0 {
 
     /** Test case wrapper class.
@@ -123,8 +123,7 @@ namespace v0 {
         friend class Harness;
     };
 
-}
-}
-}
+}   // namespace v0
+}   // namespace utest
 
- #endif // MBED_TEST_ASYNC_CASES_H
+ #endif // UTEST_CASES_H

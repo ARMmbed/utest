@@ -1,10 +1,17 @@
 {
-  "name": "mbed-test-async",
-  "version": "0.0.0",
-  "description": "Simple asynchronous test harness.",
+  "name": "utest",
+  "version": "0.0.1",
+  "description": "Simple test harness with unity and greentea integration.",
   "keywords": [
+    "greentea",
     "testing",
-    "async"
+    "unittest",
+    "unity",
+    "unit",
+    "test",
+    "asynchronous",
+    "async",
+    "mbed-official"
   ],
   "author": "Niklas Hauser <niklas.hauser@arm.com>",
   "license": "Apache-2.0",

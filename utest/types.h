@@ -16,16 +16,15 @@
  ****************************************************************************
  */
 
-#ifndef MBED_TEST_ASYNC_TYPES_H
-#define MBED_TEST_ASYNC_TYPES_H
+#ifndef UTEST_TYPES_H
+#define UTEST_TYPES_H
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
 
 
-namespace mbed {
-namespace test {
+namespace utest {
 namespace v0 {
 
     enum repeat_t {
@@ -221,8 +220,7 @@ namespace v0 {
      */
     typedef status_t (*case_failure_handler_t)(const Case *const source, const failure_t reason);
 
-}
-}
-}
+}   // namespace v0
+}   // namespace utest
 
-#endif // MBED_TEST_ASYNC_TYPES_H
+#endif // UTEST_TYPES_H
