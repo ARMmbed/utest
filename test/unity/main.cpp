@@ -20,7 +20,7 @@
 #include "unity/unity.h"
 
 
-using namespace utest::v0;
+using namespace utest::v1;
 
 control_t test_repeat(const size_t repeat_count)
 {

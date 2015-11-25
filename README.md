@@ -35,7 +35,7 @@ The following example showcases a lot of functionality and proper integration wi
 #include "utest/utest.h"
 #include "unity/unity.h"
 
-using namespace utest::v0;
+using namespace utest::v1;
 
 void test_simple() {
     TEST_ASSERT_EQUAL(0, 0);
