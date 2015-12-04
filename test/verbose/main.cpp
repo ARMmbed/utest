@@ -90,5 +90,5 @@ void app_start(int, char*[]) {
     static Serial pc(USBTX, USBRX);
     pc.baud(115200);
 
-    Harness::run(specification);
+    Harness::run(specification, 1);
 }
