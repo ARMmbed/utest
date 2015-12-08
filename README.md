@@ -230,13 +230,8 @@ For `Specification` the order of arguments is:
 
 ### Atomicity
 
-**All handlers execute with interrupts disabled!**
+All handlers execute with interrupts enabled, **except the case failure handler!**.
+This means you can write test cases that poll for interrupts to be completed inside any handler, except the failure handler.
 
-This is so that an interrupt validating its callback using `Harness::validate_callback()` does not fire before the harness even knows that it is expecting a callback.
-
-This means you cannot and should not write tests that expect interrupts to happen within the test case handler.
-Even though you can still poll for an interrupt flag, it is not recommended, since the harness cannot preempt the handlers.
-So when you are busy-waiting for an interrupt flag to be set, you disallow the harness to raise a timeout failure
-which would provide you with a meaningful message.
-
-Please use the asynchronous callback functionality for this!
+If you setup an interrupt that validates its callback using `Harness::validate_callback()` inside a test case and it fires before the test case completed, the validation will be buffered.
+If the test case then returns a timeout value, but the callback is already validated, the test harness just continues normally.
