@@ -17,7 +17,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "minar": "^1.0.0",
-    "core-util": "^1.0.1"
+    "core-util": "^1.0.1",
+    "compiler-polyfill": "^1.1.1"
   },
   "testDependencies": {
     "unity": "^2.0.0"
