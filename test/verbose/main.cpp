@@ -24,7 +24,7 @@ control_t test_repeat(const size_t repeat_count)
 {
     printf("Called for the %u. time\n", repeat_count+1);
 
-    return (repeat_count < 5) ? CaseRepeatHandlerOnly : CaseNext;
+    return (repeat_count < 5) ? CaseRepeatHandler : CaseNext;
 }
 
 void test_assert_success()

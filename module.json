@@ -21,6 +21,7 @@
     "compiler-polyfill": "^1.1.1"
   },
   "testDependencies": {
-    "unity": "^2.0.0"
+    "unity": "^2.0.0",
+    "mbed-drivers": "~0.11.0"
   }
 }
