@@ -50,9 +50,9 @@ status_t test_repeats_setup(const Case *const source, const size_t index_of_case
 }
 control_t test_repeats(const size_t repeat_count) {
     printf("Called for the %u. time\n", repeat_count+1);
-    TEST_ASSERT_NOT_EQUAL(repeat_count, 6);
+    TEST_ASSERT_NOT_EQUAL(repeat_count, 2);
     // Specify how often this test is repeated ie. (n + 1) total calls
-    return (repeat_count < 5) ? CaseRepeat : CaseNext;
+    return (repeat_count < 1) ? CaseRepeatAll : CaseNext;
 }
 
 void test_callback_validate() {
@@ -69,6 +69,16 @@ control_t test_asynchronous() {
     return CaseTimeout(200);
 }
 
+control_t test_asynchronous_timeout(const size_t repeat_count) {
+    TEST_ASSERT_MESSAGE(true, "(true == false) o_O");
+    // Set a 200ms timeout starting from now,
+    // but automatically repeat only this handler on timeout.
+    if (repeat_count < 5) return CaseRepeatHandlerOnTimeout(200);
+    // but after the 5th retry, the callback finally gets validated
+    minar::Scheduler::postCallback(test_callback_validate).delay(minar::milliseconds(100));
+    return CaseRepeatHandlerOnTimeout(200);
+}
+
 // Custom setup handler required for proper Greentea support
 status_t greentea_setup(const size_t number_of_cases) {
     MBED_HOSTTEST_TIMEOUT(20);
@@ -83,7 +93,8 @@ status_t greentea_setup(const size_t number_of_cases) {
 Case cases[] = {
     Case("Simple Test", test_simple),
     Case("Repeating Test (6x)", test_repeats_setup, test_repeats),
-    Case("Asynchronous Test (200ms timeout)", test_asynchronous)
+    Case("Asynchronous Test (200ms timeout)", test_asynchronous),
+    Case("Asynchronous Timeout Repeat", test_asynchronous_timeout)
 };
 
 // Declare your test specification with a custom setup handler
@@ -103,7 +114,7 @@ Running this test will output the following:
 {{description;Basic}}
 {{test_id;TEST_EXAMPLE_GREENTEA_SUPPORT}}
 {{start}}
->>> Running 3 test cases...
+>>> Running 4 test cases...
 
 >>> Running case #1: 'Simple Test'...
 Simple test called
@@ -112,17 +123,25 @@ Simple test called
 >>> Running case #2: 'Repeating Test (6x)'...
 Setting up for 'Repeating Test (6x)'
 Called for the 1. time
+>>> 'Repeating Test (6x)': 1 passed, 0 failed
+
+>>> Running case #2: 'Repeating Test (6x)'...
+Setting up for 'Repeating Test (6x)'
 Called for the 2. time
-Called for the 3. time
-Called for the 4. time
-Called for the 5. time
-Called for the 6. time
->>> 'Repeating Test (6x)': 6 passed, 0 failed
+>>> 'Repeating Test (6x)': 2 passed, 0 failed
 
 >>> Running case #3: 'Asynchronous Test (200ms timeout)'...
 >>> 'Asynchronous Test (200ms timeout)': 1 passed, 0 failed
 
->>> Test cases: 3 passed, 0 failed
+>>> Running case #4: 'Asynchronous Timeout Repeat'...
+>>> failure with reason 'Ignored: Timed Out'
+>>> failure with reason 'Ignored: Timed Out'
+>>> failure with reason 'Ignored: Timed Out'
+>>> failure with reason 'Ignored: Timed Out'
+>>> failure with reason 'Ignored: Timed Out'
+>>> 'Asynchronous Timeout Repeat': 1 passed, 0 failed
+
+>>> Test cases: 4 passed, 0 failed
 {{success}}
 {{end}}
 ```
@@ -136,9 +155,10 @@ Please see the `utest/types.h` file for a detailed description.
 
 1. `status_t test_setup_handler_t(const size_t number_of_cases)`: called before execution of any test case.
 1. `void test_teardown_handler_t(const size_t passed, const size_t failed, const failure_t failure)`: called after execution of all test cases, and if testing is aborted.
-1. `status_t case_setup_handler_t(const Case *const source, const size_t index_of_case)`:called before execution of each test case.
+1. `void test_failure_handler_t(const failure_t failure)`: called whenever a failure occurs anywhere in the specification.
+1. `status_t case_setup_handler_t(const Case *const source, const size_t index_of_case)`: called before execution of each test case.
 1. `status_t case_teardown_handler_t(const Case *const source, const size_t passed, const size_t failed, const failure_t reason)`: called after execution of each test case, and if testing is aborted.
-1. `status_t case_failure_handler_t(const Case *const source, const failure_t reason)`: called whenever a failure occurs.
+1. `status_t case_failure_handler_t(const Case *const source, const failure_t reason)`: called whenever a failure occurs during the execution of a test case.
 
 All handlers are defaulted for integration with the [Greentea testing automation framework](https://github.com/ARMmbed/greentea).
 
@@ -150,17 +170,20 @@ There are three test case handlers:
 1. `control_t case_control_handler_t(void)`: executes (asynchronously) as many times as you specify, if the case setup succeeded.
 1. `control_t case_repeat_count_handler_t(const size_t repeat_count)`: executes (asynchronously) as many times as you specify, if the case setup succeeded.
 
-Returning `CaseRepeat` from your test case handler tells the test harness to repeat the test handler. You can use the `repeat_count` (starts counting at zero) to decide when to stop.
-By default the setup and teardown handlers are called on every repeated test cases, however, you may only repeat the case handler by returning `CaseRepeatHandlerOnly`. To stop the harness from repeating the test case, return `CaseNext`.
+Returning `CaseRepeatAll` from your test case handler tells the test harness to repeat the test handler. You can use the `repeat_count` (starts counting at zero) to decide when to stop.
+By default the setup and teardown handlers are called on every repeated test cases, however, you may only repeat the case handler by returning `CaseRepeatHandler`. To stop the harness from repeating the test case, return `CaseNext`.
 
 For asynchronous test cases, you must return a `CaseTimeout(uint32_t ms)`.
-To validate your callback, you must call `Harness::validate_callback()` in your asynchronous callback before the timeout fires. This will schedule the
+If you want to automatically repeat the test case on a timeout, use `CaseRepeatAllOnTimeout(uint32_t ms)` and `CaseRepeatHandlerOnTimeout(uint32_t ms)`.
+
+To validate your callback, you must call `Harness::validate_callback()` in your asynchronous callback before the timeout fires.
+This will schedule the execution of the next test case.
 
 For repeating asynchronous cases, you can "add" both modifiers together: `CaseTimeout(200) + CaseRepeat` will repeat the test case after a max. of 200ms.
 Note that when adding conflicting modifiers together
 
 - the more restrictive timeout is chosen.
-- the more invasive repeat method is chosen: `CaseRepeat` > `CaseRepeatHandlerOnly` > `CaseNext`.
+- the more invasive repeat method is chosen: `CaseRepeatAll`/`CaseRepeatAllOnTimeout(ms)` > `CaseRepeatHandler`/`CaseRepeatHandlerOnTimeout(ms)` > `CaseNext`/`CaseTimeout(ms)`.
 
 To specify a test case you must wrap it into a `Case` class: `Case("mandatory description", case_handler)`. You may override the setup, teardown and failure handlers in this wrapper class as well.
 
@@ -175,11 +198,16 @@ Please note that if a teardown handler fails, the system can be considered too u
 
 You may also raise a failure manually by calling `Harness::raise_failure(failure_t reason)`. In fact, this is how you can integrate assertion failures from custom test macros, as done with the unity macros, which raise a failure with the `FAILURE_ASSERTION` reason.
 
-When waiting for an asynchronous callback, if the timeout fires,  `FAILURE_TIMEOUT` is raised.
+When waiting for an asynchronous callback, if the timeout fires, `FAILURE_TIMEOUT` is raised.
 
 The failure handler decides whether to continue or abort testing by returning `STATUS_CONTINUE` or `STATUS_ABORT` respectively.
 In case of an abort, the test harness dies by busy waiting in a forever loop.
 This is needed because we cannot unwind the stack without exception support, and the asynchronous nature of the test harness breaks with using `longjmp`s.
+
+Note that failures can be ignored by ORing `FAILURE_IGNORE` into the failure reason.
+This is used for automatically repeating test cases after a timeout, which raise a timeout failure, which is to be ignored.
+Furthermore, the unity macros may decide to ignore assertion failures as well, in which case the assertion is ignored.
+Ignored failures are not counted!
 
 ### Default Handlers
 
@@ -188,6 +216,7 @@ Three sets of default handlers with different behaviors are provided for your co
 1. `greentea_abort_handlers` (default): Greentea-style reporting, aborts on the first failure, but requires custom test setup handler.
 1. `greentea_continue_handlers`: Greentea-style reporting, always continues testing, but requires custom test setup handler.
 1. `verbose_continue_handlers`: always continues testing and reporting, except when a teardown failed.
+1. `selftest_handlers`: Greentea-style reporting, but aborts on the first assertion failure raised. This allows the use of unity macros for self testing without recursive failure handler calls.
 
 These default handlers are called when you have not overridden a custom handler, and they only contain reporting functionality and do not modify global state.
 
@@ -226,6 +255,7 @@ For `Specification` the order of arguments is:
 1. Test setup handler (optional).
 1. Array of test cases (required).
 1. Test teardown handler (optional).
+1. Test failure handler (optional).
 1. Default handlers (optional).
 
 ### Atomicity
