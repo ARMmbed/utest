@@ -44,7 +44,7 @@ void test_simple() {
 
 status_t test_repeats_setup(const Case *const source, const size_t index_of_case) {
     // Call the default handler for proper reporting
-    status_t status = verbose_case_setup_handler(source, index_of_case);
+    status_t status = greentea_case_setup_handler(source, index_of_case);
     printf("Setting up for '%s'\n", source->get_description());
     return status;
 }
@@ -86,7 +86,7 @@ status_t greentea_setup(const size_t number_of_cases) {
     MBED_HOSTTEST_DESCRIPTION(Basic);
     MBED_HOSTTEST_START("TEST_EXAMPLE_GREENTEA_SUPPORT");
     // Call the default reporting function
-    return verbose_test_setup_handler(number_of_cases);
+    return greentea_test_setup_handler(number_of_cases);
 }
 
 // Specify all your test cases here
@@ -238,7 +238,8 @@ To explicitly invoke the default handler, use the `default_handler` hint.
 To use your own custom handler, provide a function with the correct signature for the handler that you want to customize and provide it in your test case wrapper or specification wrapper.
 To turn a `failure_t` into a meaningful string use the `stringify(failure_t)` method.
 
-**We strongly recommend that you call the predefined `verbose_*` handlers inside your custom callback, as they report the current condition in a properly formatted fashion.**
+**We strongly recommend that you call the predefined `greentea_*` handlers inside your custom callback, as they report the current condition in a properly formatted fashion.**
+By calling these handlers inside your custom callback your unit test does not need to be modified if the test logging needs to be changed in the future.
 
 Note that the `Case` and `Specification` constructors are overloaded to allow you a comfortable declaration of all your callbacks.
 
