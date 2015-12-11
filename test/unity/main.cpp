@@ -70,13 +70,13 @@ control_t test_async_callback_assert_fail()
 
 status_t test_failed_setup(const Case *const source, const size_t index_of_case)
 {
-    verbose_case_setup_handler(source, index_of_case);
+    greentea_case_setup_handler(source, index_of_case);
     return STATUS_CONTINUE;
 }
 
 status_t test_failed_teardown(const Case *const source, const size_t passed, const size_t failed, const failure_t failure)
 {
-    verbose_case_teardown_handler(source, passed, failed, failure);
+    greentea_case_teardown_handler(source, passed, failed, failure);
     return STATUS_CONTINUE;
 }
 
@@ -87,7 +87,7 @@ status_t greentea_setup(const size_t number_of_cases)
     MBED_HOSTTEST_DESCRIPTION(Basic);
     MBED_HOSTTEST_START("MBED_TEST_GREENTEA_CONTINUE_WITH_UNITY");
 
-    return verbose_test_setup_handler(number_of_cases);
+    return greentea_test_setup_handler(number_of_cases);
 }
 
 const Case cases[] =
@@ -105,8 +105,5 @@ const Specification specification(greentea_setup, cases, greentea_continue_handl
 
 
 void app_start(int, char*[]) {
-    static Serial pc(USBTX, USBRX);
-    pc.baud(115200);
-
     Harness::run(specification);
 }

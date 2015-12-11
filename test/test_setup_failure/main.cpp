@@ -36,7 +36,7 @@ status_t failing_setup_handler(const size_t number_of_cases) {
     MBED_HOSTTEST_START("MBED_A1");
 
     TEST_ASSERT_EQUAL(number_of_cases, 2);
-    verbose_test_setup_handler(number_of_cases);
+    greentea_test_setup_handler(number_of_cases);
     return STATUS_ABORT;    // aborting test
 };
 // the teardown handler will then be called with the reason `FAILURE_SETUP`
@@ -53,7 +53,5 @@ void failing_teardown_handler(const size_t passed, const size_t failed, const fa
 Specification specification(failing_setup_handler, cases, failing_teardown_handler);
 
 void app_start(int, char*[]) {
-    static Serial pc(USBTX, USBRX);
-    pc.baud(115200);
     Harness::run(specification);
 }

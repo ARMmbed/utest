@@ -42,7 +42,7 @@ status_t greentea_setup(const size_t number_of_cases)
     MBED_HOSTTEST_DESCRIPTION(Basic);
     MBED_HOSTTEST_START("ASYNC_TEST_GREENTEA_ABORT");
 
-    return verbose_test_setup_handler(number_of_cases);
+    return greentea_test_setup_handler(number_of_cases);
 }
 
 Case cases[] =
@@ -54,8 +54,5 @@ Case cases[] =
 Specification specification(greentea_setup, cases);
 
 void app_start(int, char*[]) {
-    static Serial pc(USBTX, USBRX);
-    pc.baud(115200);
-
     Harness::run(specification);
 }
