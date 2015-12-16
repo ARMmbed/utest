@@ -18,10 +18,10 @@
   "dependencies": {
     "minar": "^1.0.0",
     "core-util": "^1.0.1",
-    "compiler-polyfill": "^1.1.1"
+    "compiler-polyfill": "^1.2.0"
   },
   "testDependencies": {
-    "unity": "^2.0.0",
+    "unity": "^2.0.1",
     "mbed-drivers": "~0.11.0"
   }
 }
