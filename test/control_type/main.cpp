@@ -19,7 +19,10 @@
 #include "utest/utest.h"
 #include "unity/unity.h"
 
-#define ASSERT_CONTROL(value, expected_repeat, expected_timeout) { c = value; TEST_ASSERT_EQUAL_MESSAGE(c.get_repeat(), expected_repeat, "Repeat"); TEST_ASSERT_EQUAL_MESSAGE(c.get_timeout(), expected_timeout, "Timeout"); }
+#define ASSERT_CONTROL(value, expected_repeat, expected_timeout) { \
+    c = value; \
+    TEST_ASSERT_EQUAL_MESSAGE(expected_repeat, c.get_repeat(), "Repeat"); \
+    TEST_ASSERT_EQUAL_MESSAGE(expected_timeout, c.get_timeout(), "Timeout"); }
 
 
 using namespace utest::v1;
@@ -27,8 +30,8 @@ using namespace utest::v1;
 void test_constructors()
 {
     control_t c;
-    TEST_ASSERT_EQUAL(c.get_repeat(), REPEAT_UNDECLR);
-    TEST_ASSERT_EQUAL(c.get_timeout(), TIMEOUT_UNDECLR);
+    TEST_ASSERT_EQUAL(REPEAT_UNDECLR, c.get_repeat());
+    TEST_ASSERT_EQUAL(TIMEOUT_UNDECLR, c.get_timeout());
 
     ASSERT_CONTROL(control_t(REPEAT_ALL), REPEAT_ALL, TIMEOUT_UNDECLR);
 

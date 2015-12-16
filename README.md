@@ -50,7 +50,7 @@ status_t test_repeats_setup(const Case *const source, const size_t index_of_case
 }
 control_t test_repeats(const size_t repeat_count) {
     printf("Called for the %u. time\n", repeat_count+1);
-    TEST_ASSERT_NOT_EQUAL(repeat_count, 2);
+    TEST_ASSERT_NOT_EQUAL(2, repeat_count);
     // Specify how often this test is repeated ie. (n + 1) total calls
     return (repeat_count < 1) ? CaseRepeatAll : CaseNext;
 }
@@ -62,7 +62,7 @@ void test_callback_validate() {
     Harness::validate_callback();
 }
 control_t test_asynchronous() {
-    TEST_ASSERT_MESSAGE(true, "(true == false) o_O");
+    TEST_ASSERT_TRUE_MESSAGE(true, "(true == false) o_O");
     // Set up a callback in the future. This may also be an interrupt!
     minar::Scheduler::postCallback(test_callback_validate).delay(minar::milliseconds(100));
     // Set a 200ms timeout starting from now
@@ -70,7 +70,7 @@ control_t test_asynchronous() {
 }
 
 control_t test_asynchronous_timeout(const size_t repeat_count) {
-    TEST_ASSERT_MESSAGE(true, "(true == false) o_O");
+    TEST_ASSERT_TRUE_MESSAGE(true, "(true == false) o_O");
     // Set a 200ms timeout starting from now,
     // but automatically repeat only this handler on timeout.
     if (repeat_count < 5) return CaseRepeatHandlerOnTimeout(200);

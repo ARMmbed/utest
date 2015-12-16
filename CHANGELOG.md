@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.7.3] - 2015-12-16
+### Fixed
+- Order of unity macro arguments. They were backwards before.
+
 ## [1.7.2] - 2015-12-16
 ### Added
 - Unit test for asserting `control_t` arbitration behavior.

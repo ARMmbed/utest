@@ -37,16 +37,16 @@ status_t failing_setup_handler(const size_t number_of_cases)
     MBED_HOSTTEST_DESCRIPTION(test setup failure test);
     MBED_HOSTTEST_START("MBED_A1");
 
-    TEST_ASSERT_EQUAL(number_of_cases, 2);
+    TEST_ASSERT_EQUAL(2, number_of_cases);
     greentea_test_setup_handler(number_of_cases);
     return STATUS_ABORT;    // aborting test
 };
 // the teardown handler will then be called with the reason `FAILURE_SETUP`
 void failing_teardown_handler(const size_t passed, const size_t failed, const failure_t failure)
 {
-    TEST_ASSERT_EQUAL(passed, 0);
-    TEST_ASSERT_EQUAL(failed, 0);
-    TEST_ASSERT_EQUAL(failure, FAILURE_SETUP);
+    TEST_ASSERT_EQUAL(0, passed);
+    TEST_ASSERT_EQUAL(0, failed);
+    TEST_ASSERT_EQUAL(FAILURE_SETUP, failure);
 
     verbose_test_teardown_handler(passed, failed, failure);
 
