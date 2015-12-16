@@ -187,22 +187,12 @@ void test_different_group_combinations()
     ASSERT_CONTROL(CaseRepeatHandlerOnTimeout(42) + CaseRepeatAllOnTimeout(21), REPEAT_ALL_ON_TIMEOUT, 21);
 }
 
-void test_multi_group_combinations()
-{
-    control_t c;
-
-    // CaseRepeatAll + CaseRepea
-    ASSERT_CONTROL(CaseRepeatAllOnTimeout(21) + CaseRepeatHandlerOnTimeout(42), REPEAT_ALL_ON_TIMEOUT, 21);
-    ASSERT_CONTROL(CaseRepeatHandlerOnTimeout(42) + CaseRepeatAllOnTimeout(21), REPEAT_ALL_ON_TIMEOUT, 21);
-}
-
 Case cases[] =
 {
     Case("Testing constructors", test_constructors),
     Case("Testing constants", test_constants),
     Case("Testing combinations of same group", test_same_group_combinations),
     Case("Testing combinations of different group", test_different_group_combinations)
-    Case("Testing combinations of multiple groups", test_multi_group_combinations)
 };
 
 status_t greentea_setup(const size_t number_of_cases)
