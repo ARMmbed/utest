@@ -182,8 +182,9 @@ This will schedule the execution of the next test case.
 For repeating asynchronous cases, you can "add" both modifiers together: `CaseTimeout(200) + CaseRepeat` will repeat the test case after a max. of 200ms.
 Note that when adding conflicting modifiers together
 
-- the more restrictive timeout is chosen.
-- the more invasive repeat method is chosen: `CaseRepeatAll`/`CaseRepeatAllOnTimeout(ms)` > `CaseRepeatHandler`/`CaseRepeatHandlerOnTimeout(ms)` > `CaseNext`/`CaseTimeout(ms)`.
+- the more restrictive (=shorter) timeout is chosen.
+- the more invasive repeat method is chosen: `CaseRepeatAll`/`CaseRepeatAllOnTimeout(ms)` > `CaseRepeatHandler`/`CaseRepeatHandlerOnTimeout(ms)`.
+- `CaseNext` wins.
 
 To specify a test case you must wrap it into a `Case` class: `Case("mandatory description", case_handler)`. You may override the setup, teardown and failure handlers in this wrapper class as well.
 
