@@ -1,6 +1,6 @@
 {
   "name": "utest",
-  "version": "1.7.2",
+  "version": "1.7.3",
   "description": "Simple test harness with unity and greentea integration.",
   "keywords": [
     "greentea",
