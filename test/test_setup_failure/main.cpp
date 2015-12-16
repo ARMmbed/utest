@@ -22,14 +22,16 @@
 
 using namespace utest::v1;
 
-void test_dummy() {}
-Case cases[] = {
+void test_dummy() { /* tumbleweed */ }
+Case cases[] =
+{
     Case("dummy test", test_dummy),
     Case("dummy test 2", test_dummy)
 };
 
 // this setup handler fails
-status_t failing_setup_handler(const size_t number_of_cases) {
+status_t failing_setup_handler(const size_t number_of_cases)
+{
     MBED_HOSTTEST_TIMEOUT(5);
     MBED_HOSTTEST_SELECT(default_auto);
     MBED_HOSTTEST_DESCRIPTION(test setup failure test);
@@ -40,7 +42,8 @@ status_t failing_setup_handler(const size_t number_of_cases) {
     return STATUS_ABORT;    // aborting test
 };
 // the teardown handler will then be called with the reason `FAILURE_SETUP`
-void failing_teardown_handler(const size_t passed, const size_t failed, const failure_t failure) {
+void failing_teardown_handler(const size_t passed, const size_t failed, const failure_t failure)
+{
     TEST_ASSERT_EQUAL(passed, 0);
     TEST_ASSERT_EQUAL(failed, 0);
     TEST_ASSERT_EQUAL(failure, FAILURE_SETUP);
@@ -52,6 +55,7 @@ void failing_teardown_handler(const size_t passed, const size_t failed, const fa
 
 Specification specification(failing_setup_handler, cases, failing_teardown_handler);
 
-void app_start(int, char*[]) {
+void app_start(int, char*[])
+{
     Harness::run(specification);
 }
