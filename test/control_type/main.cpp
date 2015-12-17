@@ -44,6 +44,8 @@ void test_constants()
 
     ASSERT_CONTROL(CaseNext, REPEAT_NONE, TIMEOUT_NONE);
 
+    ASSERT_CONTROL(CaseNoRepeat, REPEAT_NONE, TIMEOUT_UNDECLR);
+
     ASSERT_CONTROL(CaseRepeatAll, REPEAT_ALL, TIMEOUT_UNDECLR);
 
     ASSERT_CONTROL(CaseRepeatHandler, REPEAT_HANDLER, TIMEOUT_UNDECLR);
@@ -65,6 +67,8 @@ void test_same_group_combinations()
     control_t c;
     // arbitration within same group should not change anything
     ASSERT_CONTROL(CaseNext + CaseNext, REPEAT_NONE, TIMEOUT_NONE);
+
+    ASSERT_CONTROL(CaseNoRepeat + CaseNoRepeat, REPEAT_NONE, TIMEOUT_UNDECLR);
 
     ASSERT_CONTROL(CaseRepeatAll + CaseRepeatAll, REPEAT_ALL, TIMEOUT_UNDECLR);
 
@@ -100,6 +104,10 @@ void test_different_group_combinations()
     control_t c;
 
     // Matrix with CaseNext
+    // CaseNext + CaseNoRepeat => CaseNext
+    ASSERT_CONTROL(CaseNext + CaseNoRepeat, REPEAT_NONE, TIMEOUT_NONE);
+    ASSERT_CONTROL(CaseNoRepeat + CaseNext, REPEAT_NONE, TIMEOUT_NONE);
+
     // CaseNext + CaseRepeatAll => CaseNext
     ASSERT_CONTROL(CaseNext + CaseRepeatAll, REPEAT_NONE, TIMEOUT_NONE);
     ASSERT_CONTROL(CaseRepeatAll + CaseNext, REPEAT_NONE, TIMEOUT_NONE);
@@ -107,6 +115,10 @@ void test_different_group_combinations()
     // CaseNext + CaseRepeatHandler => CaseNext
     ASSERT_CONTROL(CaseNext + CaseRepeatHandler, REPEAT_NONE, TIMEOUT_NONE);
     ASSERT_CONTROL(CaseRepeatHandler + CaseNext, REPEAT_NONE, TIMEOUT_NONE);
+
+    // CaseNext + CaseNoTimeout => CaseNext
+    ASSERT_CONTROL(CaseNext + CaseNoTimeout, REPEAT_NONE, TIMEOUT_NONE);
+    ASSERT_CONTROL(CaseNoTimeout + CaseNext, REPEAT_NONE, TIMEOUT_NONE);
 
     // CaseNext + CaseAwait => CaseNext
     ASSERT_CONTROL(CaseNext + CaseAwait, REPEAT_NONE, TIMEOUT_NONE);
@@ -124,10 +136,39 @@ void test_different_group_combinations()
     ASSERT_CONTROL(CaseNext + CaseRepeatHandlerOnTimeout(42), REPEAT_NONE, TIMEOUT_NONE);
     ASSERT_CONTROL(CaseRepeatHandlerOnTimeout(42) + CaseNext, REPEAT_NONE, TIMEOUT_NONE);
 
+    // Matrix with CaseNoRepeat
+    // CaseNoRepeat + CaseRepeatHandler => CaseNoRepeat
+    ASSERT_CONTROL(CaseNoRepeat + CaseRepeatHandler, REPEAT_NONE, TIMEOUT_UNDECLR);
+    ASSERT_CONTROL(CaseRepeatHandler + CaseNoRepeat, REPEAT_NONE, TIMEOUT_UNDECLR);
+
+    // CaseNoRepeat + CaseNoTimeout => CaseNext
+    ASSERT_CONTROL(CaseNoRepeat + CaseNoTimeout, REPEAT_NONE, TIMEOUT_NONE);
+    ASSERT_CONTROL(CaseNoTimeout + CaseNoRepeat, REPEAT_NONE, TIMEOUT_NONE);
+
+    // CaseNoRepeat + CaseAwait => REPEAT_NONE + TIMEOUT_FOREVER
+    ASSERT_CONTROL(CaseNoRepeat + CaseAwait, REPEAT_NONE, TIMEOUT_FOREVER);
+    ASSERT_CONTROL(CaseAwait + CaseNoRepeat, REPEAT_NONE, TIMEOUT_FOREVER);
+
+    // CaseNoRepeat + CaseTimeout => REPEAT_NONE + timeout
+    ASSERT_CONTROL(CaseNoRepeat + CaseTimeout(42), REPEAT_NONE, 42);
+    ASSERT_CONTROL(CaseTimeout(42) + CaseNoRepeat, REPEAT_NONE, 42);
+
+    // CaseNoRepeat + CaseRepeatAllOnTimeout => REPEAT_NONE + timeout
+    ASSERT_CONTROL(CaseNoRepeat + CaseRepeatAllOnTimeout(42), REPEAT_NONE, 42);
+    ASSERT_CONTROL(CaseRepeatAllOnTimeout(42) + CaseNoRepeat, REPEAT_NONE, 42);
+
+    // CaseNoRepeat + CaseRepeatHandlerOnTimeout => REPEAT_NONE + timeout
+    ASSERT_CONTROL(CaseNoRepeat + CaseRepeatHandlerOnTimeout(42), REPEAT_NONE, 42);
+    ASSERT_CONTROL(CaseRepeatHandlerOnTimeout(42) + CaseNoRepeat, REPEAT_NONE, 42);
+
     // Matrix with CaseRepeatAll
     // CaseRepeatAll + CaseRepeatHandler => CaseRepeatAll
     ASSERT_CONTROL(CaseRepeatAll + CaseRepeatHandler, REPEAT_ALL, TIMEOUT_UNDECLR);
     ASSERT_CONTROL(CaseRepeatHandler + CaseRepeatAll, REPEAT_ALL, TIMEOUT_UNDECLR);
+
+    // CaseRepeatAll + CaseNoTimeout => REPEAT_ALL + TIMEOUT_NONE
+    ASSERT_CONTROL(CaseRepeatAll + CaseNoTimeout, REPEAT_ALL, TIMEOUT_NONE);
+    ASSERT_CONTROL(CaseNoTimeout + CaseRepeatAll, REPEAT_ALL, TIMEOUT_NONE);
 
     // CaseRepeatAll + CaseAwait => REPEAT_ALL + TIMEOUT_FOREVER
     ASSERT_CONTROL(CaseRepeatAll + CaseAwait, REPEAT_ALL, TIMEOUT_FOREVER);
@@ -138,14 +179,18 @@ void test_different_group_combinations()
     ASSERT_CONTROL(CaseTimeout(42) + CaseRepeatAll, REPEAT_ALL, 42);
 
     // CaseRepeatAll + CaseRepeatAllOnTimeout => (REPEAT_ALL | REPEAT_ON_TIMEOUT) + timeout
-    ASSERT_CONTROL(CaseRepeatAll + CaseRepeatAllOnTimeout(42), REPEAT_ALL | REPEAT_ON_TIMEOUT, 42);
-    ASSERT_CONTROL(CaseRepeatAllOnTimeout(42) + CaseRepeatAll, REPEAT_ALL | REPEAT_ON_TIMEOUT, 42);
+    ASSERT_CONTROL(CaseRepeatAll + CaseRepeatAllOnTimeout(42), (REPEAT_ALL | REPEAT_ON_TIMEOUT), 42);
+    ASSERT_CONTROL(CaseRepeatAllOnTimeout(42) + CaseRepeatAll, (REPEAT_ALL | REPEAT_ON_TIMEOUT), 42);
 
     // CaseRepeatAll + CaseRepeatHandlerOnTimeout => (REPEAT_ALL | REPEAT_ON_TIMEOUT) + timeout
     ASSERT_CONTROL(CaseRepeatAll + CaseRepeatHandlerOnTimeout(42), REPEAT_ALL | REPEAT_ON_TIMEOUT, 42);
     ASSERT_CONTROL(CaseRepeatHandlerOnTimeout(42) + CaseRepeatAll, REPEAT_ALL | REPEAT_ON_TIMEOUT, 42);
 
     // Matrix with CaseRepeatHandler
+    // CaseRepeatHandler + CaseNoTimeout => REPEAT_HANDLER + TIMEOUT_NONE
+    ASSERT_CONTROL(CaseRepeatHandler + CaseNoTimeout, REPEAT_HANDLER, TIMEOUT_NONE);
+    ASSERT_CONTROL(CaseNoTimeout + CaseRepeatHandler, REPEAT_HANDLER, TIMEOUT_NONE);
+
     // CaseRepeatHandler + CaseAwait => REPEAT_HANDLER + TIMEOUT_FOREVER
     ASSERT_CONTROL(CaseRepeatHandler + CaseAwait, REPEAT_HANDLER, TIMEOUT_FOREVER);
     ASSERT_CONTROL(CaseAwait + CaseRepeatHandler, REPEAT_HANDLER, TIMEOUT_FOREVER);
@@ -161,6 +206,23 @@ void test_different_group_combinations()
     // CaseRepeatHandler + CaseRepeatHandlerOnTimeout => (REPEAT_HANDLER | REPEAT_ON_TIMEOUT) + timeout
     ASSERT_CONTROL(CaseRepeatHandler + CaseRepeatHandlerOnTimeout(42), REPEAT_HANDLER | REPEAT_ON_TIMEOUT, 42);
     ASSERT_CONTROL(CaseRepeatHandlerOnTimeout(42) + CaseRepeatHandler, REPEAT_HANDLER | REPEAT_ON_TIMEOUT, 42);
+
+    // Matrix with CaseNoTimeout
+    // CaseNoTimeout + CaseAwait => CaseNoTimeout
+    ASSERT_CONTROL(CaseNoTimeout + CaseAwait, REPEAT_UNDECLR, TIMEOUT_NONE);
+    ASSERT_CONTROL(CaseAwait + CaseNoTimeout, REPEAT_UNDECLR, TIMEOUT_NONE);
+
+    // CaseNoTimeout + CaseTimeout => CaseNoTimeout
+    ASSERT_CONTROL(CaseNoTimeout + CaseTimeout(42), REPEAT_UNDECLR, TIMEOUT_NONE);
+    ASSERT_CONTROL(CaseTimeout(42) + CaseNoTimeout, REPEAT_UNDECLR, TIMEOUT_NONE);
+
+    // CaseNoTimeout + CaseRepeatAllOnTimeout => REPEAT_SETUP_TEARDOWN + TIMEOUT_NONE
+    ASSERT_CONTROL(CaseNoTimeout + CaseRepeatAllOnTimeout(42), REPEAT_SETUP_TEARDOWN, TIMEOUT_NONE);
+    ASSERT_CONTROL(CaseRepeatAllOnTimeout(42) + CaseNoTimeout, REPEAT_SETUP_TEARDOWN, TIMEOUT_NONE);
+
+    // CaseNoTimeout + CaseRepeatHandlerOnTimeout => REPEAT_CASE_ONLYgit + TIMEOUT_NONE
+    ASSERT_CONTROL(CaseNoTimeout + CaseRepeatHandlerOnTimeout(42), REPEAT_CASE_ONLY, TIMEOUT_NONE);
+    ASSERT_CONTROL(CaseRepeatHandlerOnTimeout(42) + CaseNoTimeout, REPEAT_CASE_ONLY, TIMEOUT_NONE);
 
     // Matrix with CaseAwait
     // CaseAwait + CaseTimeout => CaseTimeout

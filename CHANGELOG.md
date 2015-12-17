@@ -4,6 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.7.4] - 2015-12-17
+### Added
+- Added `CaseNoRepeat` and `CaseNoTimeout` aliases.
+
+### Fixed
+- Arbitration behavior when adding `CaseNoTimeout` to `CaseRepeat{All|Handler}OnTimeout`.
+
 ## [1.7.3] - 2015-12-16
 ### Fixed
 - Order of unity macro arguments. They were backwards before.
@@ -13,11 +20,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Unit test for asserting `control_t` arbitration behavior.
 
 ### Fixed
-- clarify and implement `control_t` arbitration behavior.
+- Clarify and implement `control_t` arbitration behavior.
 
 ## [1.7.1] - 2015-12-15
 ### Added
-- this changelog  }:-o
+- This changelog  }:-o
 
 ## [1.7.0] - 2015-12-15
 ### Added
@@ -78,8 +85,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - v1 of this small test harness. See Readme.
 
-[Unreleased]: https://github.com/ARMmbed/utest/compare/v1.7.2...HEAD
-[1.7.2]: https://github.com/ARMmbed/utest/compare/v1.7.2...v1.7.2
+[Unreleased]: https://github.com/ARMmbed/utest/compare/v1.7.4...HEAD
+[1.7.4]: https://github.com/ARMmbed/utest/compare/v1.7.3...v1.7.4
+[1.7.3]: https://github.com/ARMmbed/utest/compare/v1.7.2...v1.7.3
+[1.7.2]: https://github.com/ARMmbed/utest/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/ARMmbed/utest/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/ARMmbed/utest/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/ARMmbed/utest/compare/v1.5.1...v1.6.0
