@@ -92,7 +92,7 @@ status_t greentea_setup(const size_t number_of_cases) {
 // Specify all your test cases here
 Case cases[] = {
     Case("Simple Test", test_simple),
-    Case("Repeating Test (6x)", test_repeats_setup, test_repeats),
+    Case("Repeating Test", test_repeats_setup, test_repeats),
     Case("Asynchronous Test (200ms timeout)", test_asynchronous),
     Case("Asynchronous Timeout Repeat", test_asynchronous_timeout)
 };
@@ -120,15 +120,15 @@ Running this test will output the following:
 Simple test called
 >>> 'Simple Test': 1 passed, 0 failed
 
->>> Running case #2: 'Repeating Test (6x)'...
-Setting up for 'Repeating Test (6x)'
+>>> Running case #2: 'Repeating Test'...
+Setting up for 'Repeating Test'
 Called for the 1. time
->>> 'Repeating Test (6x)': 1 passed, 0 failed
+>>> 'Repeating Test': 1 passed, 0 failed
 
->>> Running case #2: 'Repeating Test (6x)'...
-Setting up for 'Repeating Test (6x)'
+>>> Running case #2: 'Repeating Test'...
+Setting up for 'Repeating Test'
 Called for the 2. time
->>> 'Repeating Test (6x)': 2 passed, 0 failed
+>>> 'Repeating Test': 2 passed, 0 failed
 
 >>> Running case #3: 'Asynchronous Test (200ms timeout)'...
 >>> 'Asynchronous Test (200ms timeout)': 1 passed, 0 failed
