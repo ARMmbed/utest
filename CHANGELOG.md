@@ -3,10 +3,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [1.8.0] - 2015-12-21
 ### Added
 - Self test for case setup failure.
 - Self test for case handler repeat counting.
 - Explicit constants of each handler type to `{ignore|default}_handler`.
+- Case attribute modification in `validate_callback`.
 
 ### Fixed
 - Call count in example in Readme.
@@ -95,7 +98,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - v1 of this small test harness. See Readme.
 
-[Unreleased]: https://github.com/ARMmbed/utest/compare/v1.7.4...HEAD
+[Unreleased]: https://github.com/ARMmbed/utest/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/ARMmbed/utest/compare/v1.7.4...v1.8.0
 [1.7.4]: https://github.com/ARMmbed/utest/compare/v1.7.3...v1.7.4
 [1.7.3]: https://github.com/ARMmbed/utest/compare/v1.7.2...v1.7.3
 [1.7.2]: https://github.com/ARMmbed/utest/compare/v1.7.1...v1.7.2
