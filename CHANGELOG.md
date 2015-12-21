@@ -8,7 +8,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Explicit constants of each handler type to `{ignore|default}_handler`.
 
 ### Fixed
-- Repeat count in example in Readme.
+- Call count in example in Readme.
+
+### Changed
+- Replace `repeat_count` with `call_count`, which starts at 1 not at 0.
 
 ## [1.7.4] - 2015-12-17
 ### Added

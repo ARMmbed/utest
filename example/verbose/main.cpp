@@ -20,11 +20,11 @@
 
 using namespace utest::v1;
 
-control_t test_repeat(const size_t repeat_count)
+control_t test_repeat(const size_t call_count)
 {
-    printf("Called for the %u. time\n", repeat_count+1);
+    printf("Called for the %u. time\n", call_count);
 
-    return (repeat_count < 5) ? CaseRepeatHandler : CaseNext;
+    return (call_count < 5) ? CaseRepeatHandler : CaseNext;
 }
 
 void test_assert_success()

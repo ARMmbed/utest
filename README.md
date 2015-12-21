@@ -48,11 +48,11 @@ status_t test_repeats_setup(const Case *const source, const size_t index_of_case
     printf("Setting up for '%s'\n", source->get_description());
     return status;
 }
-control_t test_repeats(const size_t repeat_count) {
-    printf("Called for the %u. time\n", repeat_count+1);
-    TEST_ASSERT_NOT_EQUAL(2, repeat_count);
-    // Specify how often this test is repeated ie. (n + 1) total calls
-    return (repeat_count < 1) ? CaseRepeatAll : CaseNext;
+control_t test_repeats(const size_t call_count) {
+    printf("Called for the %u. time\n", call_count);
+    TEST_ASSERT_NOT_EQUAL(3, call_count);
+    // Specify how often this test is repeated ie. n total calls
+    return (call_count < 2) ? CaseRepeatAll : CaseNext;
 }
 
 void test_callback_validate() {
@@ -69,11 +69,11 @@ control_t test_asynchronous() {
     return CaseTimeout(200);
 }
 
-control_t test_asynchronous_timeout(const size_t repeat_count) {
+control_t test_asynchronous_timeout(const size_t call_count) {
     TEST_ASSERT_TRUE_MESSAGE(true, "(true == false) o_O");
     // Set a 200ms timeout starting from now,
     // but automatically repeat only this handler on timeout.
-    if (repeat_count < 5) return CaseRepeatHandlerOnTimeout(200);
+    if (call_count < 5) return CaseRepeatHandlerOnTimeout(200);
     // but after the 5th retry, the callback finally gets validated
     minar::Scheduler::postCallback(test_callback_validate).delay(minar::milliseconds(100));
     return CaseRepeatHandlerOnTimeout(200);
@@ -168,9 +168,9 @@ There are three test case handlers:
 
 1. `void case_handler_t(void)`: executes once, if the case setup succeeded.
 1. `control_t case_control_handler_t(void)`: executes (asynchronously) as many times as you specify, if the case setup succeeded.
-1. `control_t case_repeat_count_handler_t(const size_t repeat_count)`: executes (asynchronously) as many times as you specify, if the case setup succeeded.
+1. `control_t case_call_count_handler_t(const size_t call_count)`: executes (asynchronously) as many times as you specify, if the case setup succeeded.
 
-Returning `CaseRepeatAll` from your test case handler tells the test harness to repeat the test handler. You can use the `repeat_count` (starts counting at zero) to decide when to stop.
+Returning `CaseRepeatAll` from your test case handler tells the test harness to repeat the test handler. You can use the `call_count` (starts counting at 1) to decide when to stop.
 By default the setup and teardown handlers are called on every repeated test cases, however, you may only repeat the case handler by returning `CaseRepeatHandler`. To stop the harness from repeating the test case, return `CaseNext`.
 
 For asynchronous test cases, you must return a `CaseTimeout(uint32_t ms)`.
@@ -182,9 +182,9 @@ This will schedule the execution of the next test case.
 For repeating asynchronous cases, you can "add" both modifiers together: `CaseTimeout(200) + CaseRepeat` will repeat the test case after a max. of 200ms.
 Note that when adding conflicting modifiers together
 
-- the more restrictive (=shorter) timeout is chosen.
-- the more invasive repeat method is chosen: `CaseRepeatAll`/`CaseRepeatAllOnTimeout(ms)` > `CaseRepeatHandler`/`CaseRepeatHandlerOnTimeout(ms)`.
-- `CaseNext` wins.
+- the more restrictive (=shorter) timeout is chosen, but `CaseNoTimeout` always wins arbitration.
+- the more invasive repeat method is chosen: `CaseRepeatAll`/`CaseRepeatAllOnTimeout(ms)` > `CaseRepeatHandler`/`CaseRepeatHandlerOnTimeout(ms)`, but `CaseNoRepeat` always wins arbitration.
+- `CaseNext` wins arbitration.
 
 To specify a test case you must wrap it into a `Case` class: `Case("mandatory description", case_handler)`. You may override the setup, teardown and failure handlers in this wrapper class as well.
 
