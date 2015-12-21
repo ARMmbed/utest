@@ -22,11 +22,14 @@
 
 using namespace utest::v1;
 
-void test_dummy() { /* tumbleweed */ }
+void never_call_case()
+{
+    TEST_FAIL_MESSAGE("Case handler should have never been called!");
+}
 Case cases[] =
 {
-    Case("dummy test", test_dummy),
-    Case("dummy test 2", test_dummy)
+    Case("dummy test", never_call_case),
+    Case("dummy test 2", never_call_case)
 };
 
 // this setup handler fails
