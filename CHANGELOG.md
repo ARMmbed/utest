@@ -5,6 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 - Self test for case setup failure.
+- Explicit constants of each handler type to `{ignore|default}_handler`.
+
 ### Fixed
 - Repeat count in example in Readme.
 
