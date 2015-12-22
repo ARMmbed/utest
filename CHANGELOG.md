@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - A few more test cases for case repeat counting.
 - Self test for case timeout handling.
 - Self test for case teardown failure.
+- Self test for callback validation (with attributes).
 
 ### Changed
 - Rename `case_control_handler` test to `case_control_repeat`.
