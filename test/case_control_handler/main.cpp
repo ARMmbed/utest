@@ -81,9 +81,33 @@ status_t repeat_handler_case_teardown(const Case *const source, const size_t pas
     return greentea_case_teardown_handler(source, passed, failed, failure);
 }
 
+control_t no_repeat_handler_case(const size_t call_count)
+{
+    static int repeat_counter(1);
+    TEST_ASSERT_EQUAL(repeat_counter, call_count);
+    TEST_ASSERT_EQUAL(1, call_count);
+    TEST_ASSERT_EQUAL(42, call_counter);
+    repeat_counter++;
+    call_counter++;
+    return CaseNoRepeat;
+}
+
+control_t next_handler_case(const size_t call_count)
+{
+    static int repeat_counter(1);
+    TEST_ASSERT_EQUAL(repeat_counter, call_count);
+    TEST_ASSERT_EQUAL(1, call_count);
+    TEST_ASSERT_EQUAL(43, call_counter);
+    repeat_counter++;
+    call_counter++;
+    return CaseNext;
+}
+
 Case cases[] = {
     Case("Control: RepeatAll", repeat_all_case_setup, repeat_all_case, repeat_all_case_teardown),
-    Case("Control: RepeatHandler", repeat_handler_case_setup, repeat_handler_case, repeat_handler_case_teardown)
+    Case("Control: RepeatHandler", repeat_handler_case_setup, repeat_handler_case, repeat_handler_case_teardown),
+    Case("Control: NoRepeat", no_repeat_handler_case),
+    Case("Control: CaseNext", next_handler_case)
 };
 
 status_t greentea_setup(const size_t number_of_cases)
@@ -97,8 +121,8 @@ status_t greentea_setup(const size_t number_of_cases)
 }
 void greentea_teardown(const size_t passed, const size_t failed, const failure_t failure)
 {
-    TEST_ASSERT_EQUAL(42, call_counter);
-    TEST_ASSERT_EQUAL(2, passed);
+    TEST_ASSERT_EQUAL(44, call_counter);
+    TEST_ASSERT_EQUAL(4, passed);
     TEST_ASSERT_EQUAL(0, failed);
     TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
     greentea_test_teardown_handler(passed, failed, failure);
