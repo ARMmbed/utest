@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [1.8.1] - 2015-12-22
+### Added
+- A few more test cases for case repeat counting.
+- Self test for case timeout handling.
+- Self test for case teardown failure.
+
+### Changed
+- Rename `case_control_handler` test to `case_control_repeat`.
 
 ## [1.8.0] - 2015-12-21
 ### Added
@@ -98,7 +106,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - v1 of this small test harness. See Readme.
 
-[Unreleased]: https://github.com/ARMmbed/utest/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/ARMmbed/utest/compare/v1.8.1...HEAD
+[1.8.1]: https://github.com/ARMmbed/utest/compare/v1.8.0...v1.8.1
 [1.8.0]: https://github.com/ARMmbed/utest/compare/v1.7.4...v1.8.0
 [1.7.4]: https://github.com/ARMmbed/utest/compare/v1.7.3...v1.7.4
 [1.7.3]: https://github.com/ARMmbed/utest/compare/v1.7.2...v1.7.3
