@@ -13,6 +13,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Rename `case_control_handler` test to `case_control_repeat`.
 
+### Fixed
+- Modifying case attributes during callback validation.
+
 ## [1.8.0] - 2015-12-21
 ### Added
 - Self test for case setup failure.
