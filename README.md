@@ -311,11 +311,6 @@ So if you want to support the ARMCC toolchain, you unfortunately cannot use lamb
 
 using namespace utest::v1;
 
-void test_callback_validate() {
-    TEST_ASSERT_EQUAL_PTR(0, 0);
-    Harness::validate_callback();
-}
-
 Case cases[] = {
     Case("Simple Test", []() {
         TEST_ASSERT_EQUAL(0, 0);
@@ -333,13 +328,18 @@ Case cases[] = {
     }),
     Case("Asynchronous Test (200ms timeout)", []() {
         TEST_ASSERT_TRUE_MESSAGE(true, "(true == false) o_O");
-        minar::Scheduler::postCallback(test_callback_validate).delay(minar::milliseconds(100));
+        minar::Scheduler::postCallback([]() {
+                Harness::validate_callback();
+            }).delay(minar::milliseconds(100));
         return CaseTimeout(200);
     }),
     Case("Asynchronous Timeout Repeat", [](const size_t call_count) -> control_t {
         TEST_ASSERT_TRUE_MESSAGE(true, "(true == false) o_O");
-        if (call_count >= 5)
-            minar::Scheduler::postCallback(test_callback_validate).delay(minar::milliseconds(100));
+        if (call_count >= 5) {
+            minar::Scheduler::postCallback([]() {
+                    Harness::validate_callback();
+                }).delay(minar::milliseconds(100));
+        }
         return CaseRepeatHandlerOnTimeout(200);
     })
 };

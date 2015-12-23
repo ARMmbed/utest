@@ -19,13 +19,6 @@
 
 using namespace utest::v1;
 
-void test_callback_validate()
-{   // You may also use assertions here!
-    TEST_ASSERT_EQUAL_PTR(0, 0);
-    // Validate the callback
-    Harness::validate_callback();
-}
-
 // Specify all your test cases here
 Case cases[] =
 {
@@ -48,7 +41,12 @@ Case cases[] =
     Case("Asynchronous Test (200ms timeout)", []() -> control_t { // optional return type declaration
         TEST_ASSERT_TRUE_MESSAGE(true, "(true == false) o_O");
         // Set up a callback in the future. This may also be an interrupt!
-        minar::Scheduler::postCallback(test_callback_validate).delay(minar::milliseconds(100));
+        minar::Scheduler::postCallback([]()
+        {   // You may also use assertions here!
+            TEST_ASSERT_EQUAL_PTR(0, 0);
+            // Validate the callback
+            Harness::validate_callback();
+        }).delay(minar::milliseconds(100));
         // Set a 200ms timeout starting from now
         return CaseTimeout(200);
     }),
@@ -58,7 +56,10 @@ Case cases[] =
         // but automatically repeat only this handler on timeout.
         if (call_count >= 5) {
             // but after the 5th retry, the callback finally gets validated
-            minar::Scheduler::postCallback(test_callback_validate).delay(minar::milliseconds(100));
+            minar::Scheduler::postCallback([]()
+            {   // Validate the callback
+                Harness::validate_callback();
+            }).delay(minar::milliseconds(100));
         }
         return CaseRepeatHandlerOnTimeout(200);
     })
