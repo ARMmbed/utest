@@ -1,0 +1,89 @@
+/* mbed Microcontroller Library
+ * Copyright (c) 2013-2015 ARM Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#include "mbed-drivers/test_env.h"
+#include "utest/utest.h"
+#include "unity/unity.h"
+
+using namespace utest::v1;
+
+void test_simple() {
+    TEST_ASSERT_EQUAL(0, 0);
+    printf("Simple test called\n");
+}
+
+status_t test_repeats_setup(const Case *const source, const size_t index_of_case) {
+    // Call the default handler for proper reporting
+    status_t status = greentea_case_setup_handler(source, index_of_case);
+    printf("Setting up for '%s'\n", source->get_description());
+    return status;
+}
+control_t test_repeats(const size_t call_count) {
+    printf("Called for the %u. time\n", call_count);
+    TEST_ASSERT_NOT_EQUAL(3, call_count);
+    // Specify how often this test is repeated ie. n total calls
+    return (call_count < 2) ? CaseRepeatAll : CaseNext;
+}
+
+void test_callback_validate() {
+    // You may also use assertions here!
+    TEST_ASSERT_EQUAL_PTR(0, 0);
+    // Validate the callback
+    Harness::validate_callback();
+}
+control_t test_asynchronous() {
+    TEST_ASSERT_TRUE_MESSAGE(true, "(true == false) o_O");
+    // Set up a callback in the future. This may also be an interrupt!
+    minar::Scheduler::postCallback(test_callback_validate).delay(minar::milliseconds(100));
+    // Set a 200ms timeout starting from now
+    return CaseTimeout(200);
+}
+
+control_t test_asynchronous_timeout(const size_t call_count) {
+    TEST_ASSERT_TRUE_MESSAGE(true, "(true == false) o_O");
+    // Set a 200ms timeout starting from now,
+    // but automatically repeat only this handler on timeout.
+    if (call_count >= 5) {
+        // but after the 5th call, the callback finally gets validated
+        minar::Scheduler::postCallback(test_callback_validate).delay(minar::milliseconds(100));
+    }
+    return CaseRepeatHandlerOnTimeout(200);
+}
+
+// Custom setup handler required for proper Greentea support
+status_t greentea_setup(const size_t number_of_cases) {
+    MBED_HOSTTEST_TIMEOUT(20);
+    MBED_HOSTTEST_SELECT(default_auto);
+    MBED_HOSTTEST_DESCRIPTION(utest greentea example);
+    MBED_HOSTTEST_START("MBED_OS");
+    // Call the default reporting function
+    return greentea_test_setup_handler(number_of_cases);
+}
+
+// Specify all your test cases here
+Case cases[] = {
+    Case("Simple Test", test_simple),
+    Case("Repeating Test", test_repeats_setup, test_repeats),
+    Case("Asynchronous Test (200ms timeout)", test_asynchronous),
+    Case("Asynchronous Timeout Repeat", test_asynchronous_timeout)
+};
+
+// Declare your test specification with a custom setup handler
+Specification specification(greentea_setup, cases);
+
+void app_start(int, char**)
+{   // Run the test specification
+    Harness::run(specification);
+}
