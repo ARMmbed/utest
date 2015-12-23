@@ -220,7 +220,7 @@ void test_different_group_combinations()
     ASSERT_CONTROL(CaseNoTimeout + CaseRepeatAllOnTimeout(42), REPEAT_SETUP_TEARDOWN, TIMEOUT_NONE);
     ASSERT_CONTROL(CaseRepeatAllOnTimeout(42) + CaseNoTimeout, REPEAT_SETUP_TEARDOWN, TIMEOUT_NONE);
 
-    // CaseNoTimeout + CaseRepeatHandlerOnTimeout => REPEAT_CASE_ONLYgit + TIMEOUT_NONE
+    // CaseNoTimeout + CaseRepeatHandlerOnTimeout => REPEAT_CASE_ONLY + TIMEOUT_NONE
     ASSERT_CONTROL(CaseNoTimeout + CaseRepeatHandlerOnTimeout(42), REPEAT_CASE_ONLY, TIMEOUT_NONE);
     ASSERT_CONTROL(CaseRepeatHandlerOnTimeout(42) + CaseNoTimeout, REPEAT_CASE_ONLY, TIMEOUT_NONE);
 
