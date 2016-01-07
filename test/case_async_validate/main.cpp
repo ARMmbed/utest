@@ -62,7 +62,8 @@ status_t multiple_validation_case_teardown(const Case *const source, const size_
 {
     TEST_ASSERT_EQUAL(1, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(9, call_counter++);
     return verbose_case_teardown_handler(source, passed, failed, failure);
 }
@@ -84,7 +85,8 @@ status_t premature_validation_case_teardown(const Case *const source, const size
 {
     TEST_ASSERT_EQUAL(1, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(11, call_counter++);
     return verbose_case_teardown_handler(source, passed, failed, failure);
 }
@@ -107,7 +109,8 @@ status_t multiple_premature_validation_case_teardown(const Case *const source, c
 {
     TEST_ASSERT_EQUAL(1, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(17, call_counter++);
     return verbose_case_teardown_handler(source, passed, failed, failure);
 }
@@ -130,7 +133,8 @@ status_t attributed_validation_cancel_repeat_case_teardown(const Case *const sou
 {
     TEST_ASSERT_EQUAL(1, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(20, call_counter++);
     return verbose_case_teardown_handler(source, passed, failed, failure);
 }
@@ -161,7 +165,8 @@ status_t attributed_validation_enable_repeat_case_teardown(const Case *const sou
 {
     TEST_ASSERT_EQUAL(2, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(26, call_counter++);
     return verbose_case_teardown_handler(source, passed, failed, failure);
 }
@@ -190,7 +195,8 @@ void greentea_teardown(const size_t passed, const size_t failed, const failure_t
     TEST_ASSERT_EQUAL(27, call_counter++);
     TEST_ASSERT_EQUAL(6, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     greentea_test_teardown_handler(passed, failed, failure);
 }
 

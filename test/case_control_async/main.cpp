@@ -30,11 +30,12 @@ control_t timeout_failure_case(const size_t call_count)
     TEST_ASSERT_EQUAL(0, call_counter++);
     return CaseTimeout(100);
 }
-status_t timeout_failure_case_failure_handler(const Case *const source, const failure_t reason)
+status_t timeout_failure_case_failure_handler(const Case *const source, const failure_t failure)
 {
     TEST_ASSERT_EQUAL(1, call_counter++);
-    TEST_ASSERT_EQUAL(FAILURE_TIMEOUT, reason);
-    verbose_case_failure_handler(source, reason);
+    TEST_ASSERT_EQUAL(REASON_TIMEOUT, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_CASE_HANDLER, failure.location);
+    verbose_case_failure_handler(source, failure);
     return STATUS_CONTINUE;
 }
 status_t timeout_failure_case_teardown(const Case *const source, const size_t passed, const size_t failed, const failure_t failure)
@@ -42,7 +43,8 @@ status_t timeout_failure_case_teardown(const Case *const source, const size_t pa
     TEST_ASSERT_EQUAL(2, call_counter++);
     TEST_ASSERT_EQUAL(0, passed);
     TEST_ASSERT_EQUAL(1, failed);
-    TEST_ASSERT_EQUAL(FAILURE_CASES, failure);
+    TEST_ASSERT_EQUAL(REASON_CASES, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_UNKNOWN, failure.location);
     return greentea_case_teardown_handler(source, passed, failed, failure);
 }
 
@@ -63,7 +65,8 @@ status_t timeout_success_case_failure_handler(const Case *const source, const si
     TEST_ASSERT_EQUAL(5, call_counter++);
     TEST_ASSERT_EQUAL(1, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     return greentea_case_teardown_handler(source, passed, failed, failure);
 }
 
@@ -106,7 +109,8 @@ status_t repeat_all_on_timeout_case_teardown(const Case *const source, const siz
     static int repeat_counter(0);
     TEST_ASSERT_EQUAL((call_counter == 38) ? 1 : 0, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(repeat_counter*3 + ((repeat_counter == 9) ? 11 : 10), call_counter++);
     repeat_counter++;
     return greentea_case_teardown_handler(source, passed, failed, failure);
@@ -135,7 +139,8 @@ status_t repeat_handler_on_timeout_case_teardown(const Case *const source, const
 {
     TEST_ASSERT_EQUAL(1, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(51, call_counter++);
     return greentea_case_teardown_handler(source, passed, failed, failure);
 }
@@ -182,7 +187,8 @@ void greentea_teardown(const size_t passed, const size_t failed, const failure_t
     TEST_ASSERT_EQUAL(54, call_counter++);
     TEST_ASSERT_EQUAL(6, passed);
     TEST_ASSERT_EQUAL(1, failed);
-    TEST_ASSERT_EQUAL(FAILURE_CASES, failure);
+    TEST_ASSERT_EQUAL(REASON_CASES, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_UNKNOWN, failure.location);
     verbose_test_teardown_handler(passed, failed, failure);
     MBED_HOSTTEST_RESULT(true);
 }

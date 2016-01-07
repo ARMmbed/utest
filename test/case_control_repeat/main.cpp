@@ -46,7 +46,8 @@ status_t repeat_all_case_teardown(const Case *const source, const size_t passed,
     TEST_ASSERT_EQUAL(repeat_counter*3 + 2, call_counter++);
     TEST_ASSERT_EQUAL(repeat_counter+1, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     repeat_counter++;
     return greentea_case_teardown_handler(source, passed, failed, failure);
 }
@@ -71,7 +72,8 @@ status_t repeat_handler_case_teardown(const Case *const source, const size_t pas
     TEST_ASSERT_EQUAL(41, call_counter++);
     TEST_ASSERT_EQUAL(10, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     return greentea_case_teardown_handler(source, passed, failed, failure);
 }
 
@@ -116,7 +118,8 @@ void greentea_teardown(const size_t passed, const size_t failed, const failure_t
     TEST_ASSERT_EQUAL(44, call_counter);
     TEST_ASSERT_EQUAL(4, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     greentea_test_teardown_handler(passed, failed, failure);
 }
 

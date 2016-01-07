@@ -32,7 +32,8 @@ status_t continue_case_teardown(const Case *const source, const size_t passed, c
 {
     TEST_ASSERT_EQUAL(1, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(1, call_counter++);
     return verbose_case_teardown_handler(source, passed, failed, failure);
 }
@@ -51,16 +52,18 @@ status_t ignore_case_teardown(const Case *const source, const size_t passed, con
 {
     TEST_ASSERT_EQUAL(1, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(3, call_counter++);
     verbose_case_teardown_handler(source, passed, failed, failure);
     return STATUS_ABORT;
 }
-status_t ignore_failure(const Case *const source, const failure_t reason)
+status_t ignore_failure(const Case *const source, const failure_t failure)
 {
     TEST_ASSERT_EQUAL(4, call_counter++);
-    TEST_ASSERT_EQUAL(FAILURE_TEARDOWN, reason);
-    verbose_case_failure_handler(source, failure_t(reason | FAILURE_IGNORE));
+    TEST_ASSERT_EQUAL(REASON_CASE_TEARDOWN, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_CASE_TEARDOWN, failure.location);
+    verbose_case_failure_handler(source, failure.ignored());
     return STATUS_IGNORE;
 }
 
@@ -73,16 +76,18 @@ status_t abort_case_teardown(const Case *const source, const size_t passed, cons
 {
     TEST_ASSERT_EQUAL(1, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(6, call_counter++);
     verbose_case_teardown_handler(source, passed, failed, failure);
     return STATUS_ABORT;
 }
-status_t abort_failure(const Case *const source, const failure_t reason)
+status_t abort_failure(const Case *const source, const failure_t failure)
 {
     TEST_ASSERT_EQUAL(7, call_counter++);
-    TEST_ASSERT_EQUAL(FAILURE_TEARDOWN, reason);
-    return verbose_case_failure_handler(source, reason);
+    TEST_ASSERT_EQUAL(REASON_CASE_TEARDOWN, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_CASE_TEARDOWN, failure.location);
+    return verbose_case_failure_handler(source, failure);
 }
 
 // Cases --------------------------------------------------------------------------------------------------------------
@@ -109,7 +114,8 @@ void greentea_teardown(const size_t passed, const size_t failed, const failure_t
     TEST_ASSERT_EQUAL(8, call_counter++);
     TEST_ASSERT_EQUAL(2, passed);
     TEST_ASSERT_EQUAL(1, failed);
-    TEST_ASSERT_EQUAL(FAILURE_TEARDOWN, failure);
+    TEST_ASSERT_EQUAL(REASON_CASE_TEARDOWN, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_CASE_TEARDOWN, failure.location);
 
     MBED_HOSTTEST_RESULT(true);
 }

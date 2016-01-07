@@ -22,14 +22,15 @@
 
 using namespace utest::v1;
 
+bool failure_is_in_setup = false;
+
 void never_call_case()
 {
     TEST_FAIL_MESSAGE("Case handler should have never been called!");
 }
 Case cases[] =
 {
-    Case("dummy test", never_call_case),
-    Case("dummy test 2", never_call_case)
+    Case("dummy test", never_call_case)
 };
 
 // this setup handler fails
@@ -37,27 +38,40 @@ status_t failing_setup_handler(const size_t number_of_cases)
 {
     MBED_HOSTTEST_TIMEOUT(5);
     MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(test setup failure test);
-    MBED_HOSTTEST_START("MBED_A1");
+    MBED_HOSTTEST_DESCRIPTION(test assertion failure during test setup);
+    MBED_HOSTTEST_START("MBED_OS");
 
-    TEST_ASSERT_EQUAL(2, number_of_cases);
-    greentea_test_setup_handler(number_of_cases);
-    return STATUS_ABORT;    // aborting test
+    status_t status = greentea_test_setup_handler(number_of_cases);
+
+    failure_is_in_setup = true;
+    TEST_FAIL_MESSAGE("Explicit assertion failure in test setup handler!");
+    return status;
 };
-// the teardown handler will then be called with the reason `REASON_TEST_SETUP`
-void failing_teardown_handler(const size_t passed, const size_t failed, const failure_t failure)
+
+void test_failure_handler(const failure_t failure)
 {
-    TEST_ASSERT_EQUAL(0, passed);
-    TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(REASON_TEST_SETUP, failure.reason);
-    TEST_ASSERT_EQUAL(LOCATION_TEST_SETUP, failure.location);
+    if (failure_is_in_setup) {
+        failure_is_in_setup = false;
+        TEST_ASSERT_EQUAL(REASON_ASSERTION, failure.reason);
+        TEST_ASSERT_EQUAL(LOCATION_TEST_SETUP, failure.location);
+        verbose_test_failure_handler(failure);
+        MBED_HOSTTEST_RESULT(true);
+    }
+    else {
+        selftest_handlers.test_failure(failure);
+    }
+}
 
-    verbose_test_teardown_handler(passed, failed, failure);
-
-    if (failure.reason & REASON_TEST_SETUP) MBED_HOSTTEST_RESULT(true);
+const handlers_t custom_handlers = {
+    greentea_abort_handlers.test_setup,
+    greentea_abort_handlers.test_teardown,
+    test_failure_handler,
+    greentea_abort_handlers.case_setup,
+    greentea_abort_handlers.case_teardown,
+    greentea_abort_handlers.case_failure
 };
 
-Specification specification(failing_setup_handler, cases, failing_teardown_handler, selftest_handlers);
+Specification specification(failing_setup_handler, cases, custom_handlers);
 
 void app_start(int, char*[])
 {

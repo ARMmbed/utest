@@ -40,7 +40,8 @@ status_t abort_case_teardown(const Case *const source, const size_t passed, cons
     TEST_ASSERT_EQUAL(1, call_counter);
     TEST_ASSERT_EQUAL(0, passed);
     TEST_ASSERT_EQUAL(1, failed);
-    TEST_ASSERT_EQUAL(FAILURE_SETUP, failure);
+    TEST_ASSERT_EQUAL(REASON_CASE_SETUP, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_CASE_SETUP, failure.location);
     call_counter++;
     return verbose_case_teardown_handler(source, passed, failed, failure);
 }
@@ -58,7 +59,8 @@ status_t ignore_case_teardown(const Case *const source, const size_t passed, con
     TEST_ASSERT_EQUAL(3, call_counter);
     TEST_ASSERT_EQUAL(0, passed);
     TEST_ASSERT_EQUAL(1, failed);
-    TEST_ASSERT_EQUAL(FAILURE_SETUP, failure);
+    TEST_ASSERT_EQUAL(REASON_CASE_SETUP, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_CASE_SETUP, failure.location);
     call_counter++;
     return verbose_case_teardown_handler(source, passed, failed, failure);
 }
@@ -81,7 +83,8 @@ status_t continue_case_teardown(const Case *const source, const size_t passed, c
     TEST_ASSERT_EQUAL(6, call_counter);
     TEST_ASSERT_EQUAL(1, passed);
     TEST_ASSERT_EQUAL(0, failed);
-    TEST_ASSERT_EQUAL(FAILURE_NONE, failure);
+    TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     call_counter++;
     return verbose_case_teardown_handler(source, passed, failed, failure);
 }
@@ -108,10 +111,11 @@ void greentea_teardown(const size_t passed, const size_t failed, const failure_t
     TEST_ASSERT_EQUAL(7, call_counter);
     TEST_ASSERT_EQUAL(1, passed);
     TEST_ASSERT_EQUAL(2, failed);
-    TEST_ASSERT_EQUAL(FAILURE_CASES, failure);
+    TEST_ASSERT_EQUAL(REASON_CASES, failure.reason);
+    TEST_ASSERT_EQUAL(LOCATION_UNKNOWN, failure.location);
 
     // if the teardown handler was called because
-    if (failure & FAILURE_CASES) MBED_HOSTTEST_RESULT(true);
+    if (failure.reason & REASON_CASES) MBED_HOSTTEST_RESULT(true);
 }
 
 Specification specification(greentea_setup, cases, greentea_teardown, selftest_handlers);
