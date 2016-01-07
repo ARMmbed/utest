@@ -189,7 +189,7 @@ You can modify test case behavior by returning `control_t` modifiers:
 - `CaseRepeatHandler`: repeats test case **without** set and teardown handlers.
 - `CaseNoTimeout`: immediately moves to next test case.
 - `CaseAwait`: waits indefinitely for callback validation (*use with caution*).
-- `CaseTimeout(uint32_t ms)`: waits for callback validation for `ms` milliseconds, times out after that (fails with `FAILURE_TIMEOUT`).
+- `CaseTimeout(uint32_t ms)`: waits for callback validation for `ms` milliseconds, times out after that (fails with `REASON_TIMEOUT`).
 - `CaseRepeatAllOnTimeout(uint32_t ms)`: waits for callback validation for `ms` milliseconds, repeats test case **with** setup and teardown handlers on time out.
 - `CaseRepeatHandlerOnTimeout(uint32_t ms)`: waits for callback validation for `ms` milliseconds, repeats test case **without** setup and teardown handlers on time out.
 
@@ -211,20 +211,20 @@ This custom functionality is purposefully not part of this test harness, you can
 
 ### Failure Handlers
 
-A failure may occur during any phase of the test. If the setup or teardown handlers fail, they may return a `STATUS_ABORT` code, which will call the failure handler with the appropriate failure reason (`FAILURE_SETUP` and `FAILURE_TEARDOWN` respectively).
+A failure may occur during any phase of the test. If the setup or teardown handlers fail, they may return a `STATUS_ABORT` code, which will call the failure handler with the appropriate failure reason (`REASON_SETUP` and `REASON_TEARDOWN` respectively).
 If the setup handler fails, the test case is never executed. Instead, the teardown handler is called in an attempt to salvage the situation.
 Please note that if a teardown handler fails, the system can be considered too unstable to continue testing.
 
-You may also raise a failure manually by calling `Harness::raise_failure(failure_t reason)`. In fact, this is how you can integrate assertion failures from custom test macros, as done with the unity macros, which raise a failure with the `FAILURE_ASSERTION` reason.
+You may also raise a failure manually by calling `Harness::raise_failure(failure_t reason)`. In fact, this is how you can integrate assertion failures from custom test macros, as done with the unity macros, which raise a failure with the `REASON_ASSERTION` reason.
 
-When waiting for an asynchronous callback, if the timeout fires, `FAILURE_TIMEOUT` is raised.
+When waiting for an asynchronous callback, if the timeout fires, `REASON_TIMEOUT` is raised.
 
 The failure handler decides whether to continue or abort testing by returning `STATUS_CONTINUE` or `STATUS_ABORT` respectively.
 You can also ignore any raised failure by returning `STATUS_IGNORE` and the harness will then not count this failure.
 In case of an abort, the test harness dies by busy waiting in a forever loop.
 This is needed because we cannot unwind the stack without exception support, and the asynchronous nature of the test harness breaks with using `longjmp`s.
 
-Note that when `FAILURE_IGNORE` is `OR`ed into the failure reason, the failure handler is expected to return `STATUS_IGNORE`.
+Note that when `REASON_IGNORE` is `OR`ed into the failure reason, the failure handler is expected to return `STATUS_IGNORE`.
 This is done automatically for test cases repeating after a timeout, and the default failure handlers also report this failure, but tell the harness to ignore it.
 Furthermore, the unity macros may decide to ignore assertion failures as well, in which case the assertion is ignored intentionally.
 
