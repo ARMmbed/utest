@@ -3,12 +3,20 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [1.9.0] - 2016-01-07
+### Added
+- Location information to `failure_t` and report it in failure handlers.
+- Added documentation about failure reasons and locations to Readme.
+
+### Fixed
+- Assertion failures on test setup and test teardown will now not be ignored.
+
 ## [1.8.2] - 2015-12-23
 ### Added
 - Code examples from Readme as tests.
 
 ### Changed
-- Updated Readme with more documentation
+- Updated Readme with more documentation.
 
 ## [1.8.1] - 2015-12-22
 ### Added

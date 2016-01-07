@@ -211,11 +211,37 @@ This custom functionality is purposefully not part of this test harness, you can
 
 ### Failure Handlers
 
-A failure may occur during any phase of the test. If the setup or teardown handlers fail, they may return a `STATUS_ABORT` code, which will call the failure handler with the appropriate failure reason (`REASON_SETUP` and `REASON_TEARDOWN` respectively).
+A failure may occur during any phase of the test. The appropriate failure handler is then called with `failure_t`, which contains the failure reason and location.
+
+The failure reasons are:
+
+- `REASON_NONE`: No failure occurred
+- `REASON_UNKNOWN`: An unknown failure occurred
+- `REASON_CASES`: A failure occurred in at least one test case
+- `REASON_EMPTY_CASE`: The test case contains only empty handlers
+- `REASON_TIMEOUT`: An expected asynchronous call timed out
+- `REASON_ASSERTION`: An assertion failed
+- `REASON_TEST_SETUP`: Test setup failed
+- `REASON_TEST_TEARDOWN`: Test teardown failed
+- `REASON_CASE_SETUP`: Case setup failed
+- `REASON_CASE_HANDLER`: Case handler failed
+- `REASON_CASE_TEARDOWN`: Case teardown failed
+
+The failure locations are:
+
+- `LOCATION_NONE`: No location information
+- `LOCATION_UNKNOWN`: A failure occurred in an unknown location
+- `LOCATION_TEST_SETUP`: A failure occurred in the test setup
+- `LOCATION_TEST_TEARDOWN`: A failure occurred in the test teardown
+- `LOCATION_CASE_SETUP`: A failure occurred in the case setup
+- `LOCATION_CASE_HANDLER`: A failure occurred in the case handler
+- `LOCATION_CASE_TEARDOWN`: A failure occurred in the case teardown
+
+If the setup or teardown handlers fail, they may return a `STATUS_ABORT` code, which will call the failure handler with the appropriate failure reason (`REASON_CASE_{SETUP|TEARDOWN}`) and failure location (`LOCATION_CASE_{SETUP|TEARDOWN}`).
 If the setup handler fails, the test case is never executed. Instead, the teardown handler is called in an attempt to salvage the situation.
 Please note that if a teardown handler fails, the system can be considered too unstable to continue testing.
 
-You may also raise a failure manually by calling `Harness::raise_failure(failure_t reason)`. In fact, this is how you can integrate assertion failures from custom test macros, as done with the unity macros, which raise a failure with the `REASON_ASSERTION` reason.
+You may also raise a failure manually by calling `Harness::raise_failure(failure_reason_t reason)`. In fact, this is how you can integrate assertion failures from custom test macros, as done with the unity macros, which raise a failure with the `REASON_ASSERTION` reason.
 
 When waiting for an asynchronous callback, if the timeout fires, `REASON_TIMEOUT` is raised.
 
