@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [1.9.1] - 2016-01-25
+### Fixed
+- Also check `control_handler` in `Case::is_empty()`.
+
 ## [1.9.0] - 2016-01-07
 ### Added
 - Location information to `failure_t` and report it in failure handlers.
@@ -125,7 +129,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - v1 of this small test harness. See Readme.
 
-[Unreleased]: https://github.com/ARMmbed/utest/compare/v1.8.2...HEAD
+[Unreleased]: https://github.com/ARMmbed/utest/compare/v1.9.1...HEAD
+[1.9.1]: https://github.com/ARMmbed/utest/compare/v1.9.0...v1.9.1
+[1.9.0]: https://github.com/ARMmbed/utest/compare/v1.8.2...v1.9.0
 [1.8.2]: https://github.com/ARMmbed/utest/compare/v1.8.1...v1.8.2
 [1.8.1]: https://github.com/ARMmbed/utest/compare/v1.8.0...v1.8.1
 [1.8.0]: https://github.com/ARMmbed/utest/compare/v1.7.4...v1.8.0
