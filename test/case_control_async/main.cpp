@@ -187,8 +187,7 @@ void greentea_teardown(const size_t passed, const size_t failed, const failure_t
     TEST_ASSERT_EQUAL(1, failed);
     TEST_ASSERT_EQUAL(REASON_CASES, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_UNKNOWN, failure.location);
-    verbose_test_teardown_handler(passed, failed, failure);
-    GREENTEA_TESTSUITE_RESULT(true);
+    greentea_test_teardown_handler(passed, failed, failure);
 }
 
 Specification specification(greentea_setup, cases, greentea_teardown, selftest_handlers);
