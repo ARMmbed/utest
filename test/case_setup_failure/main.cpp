@@ -35,6 +35,7 @@ status_t abort_case_setup(const Case *const source, const size_t index_of_case)
     verbose_case_setup_handler(source, index_of_case);
     return STATUS_ABORT;
 }
+
 status_t abort_case_teardown(const Case *const source, const size_t passed, const size_t failed, const failure_t failure)
 {
     TEST_ASSERT_EQUAL(1, call_counter);
@@ -43,7 +44,7 @@ status_t abort_case_teardown(const Case *const source, const size_t passed, cons
     TEST_ASSERT_EQUAL(REASON_CASE_SETUP, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_CASE_SETUP, failure.location);
     call_counter++;
-    return verbose_case_teardown_handler(source, passed, failed, failure);
+    return greentea_case_teardown_handler(source, passed, failed, failure);
 }
 
 status_t ignore_case_setup(const Case *const source, const size_t index_of_case)
@@ -54,6 +55,7 @@ status_t ignore_case_setup(const Case *const source, const size_t index_of_case)
     call_counter++;
     return STATUS_IGNORE;   // this is the same
 }
+
 status_t ignore_case_teardown(const Case *const source, const size_t passed, const size_t failed, const failure_t failure)
 {
     TEST_ASSERT_EQUAL(3, call_counter);
@@ -62,7 +64,7 @@ status_t ignore_case_teardown(const Case *const source, const size_t passed, con
     TEST_ASSERT_EQUAL(REASON_CASE_SETUP, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_CASE_SETUP, failure.location);
     call_counter++;
-    return verbose_case_teardown_handler(source, passed, failed, failure);
+    return greentea_case_teardown_handler(source, passed, failed, failure);
 }
 
 status_t continue_case_setup(const Case *const source, const size_t index_of_case)
@@ -73,11 +75,13 @@ status_t continue_case_setup(const Case *const source, const size_t index_of_cas
     call_counter++;
     return STATUS_CONTINUE;   // this is the same
 }
+
 void continue_case_handler()
 {
     TEST_ASSERT_EQUAL(5, call_counter);
     call_counter++;
 }
+
 status_t continue_case_teardown(const Case *const source, const size_t passed, const size_t failed, const failure_t failure)
 {
     TEST_ASSERT_EQUAL(6, call_counter);
@@ -86,7 +90,7 @@ status_t continue_case_teardown(const Case *const source, const size_t passed, c
     TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     call_counter++;
-    return verbose_case_teardown_handler(source, passed, failed, failure);
+    return greentea_case_teardown_handler(source, passed, failed, failure);
 }
 
 Case cases[] = {
@@ -102,6 +106,7 @@ status_t greentea_setup(const size_t number_of_cases)
 
     return verbose_test_setup_handler(number_of_cases);
 }
+
 void greentea_teardown(const size_t passed, const size_t failed, const failure_t failure)
 {
     verbose_test_teardown_handler(passed, failed, failure);
