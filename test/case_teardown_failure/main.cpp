@@ -100,10 +100,8 @@ Case cases[] = {
 // Specification: Setup & Teardown ------------------------------------------------------------------------------------
 status_t greentea_setup(const size_t number_of_cases)
 {
-    MBED_HOSTTEST_TIMEOUT(5);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(case setup failure test);
-    MBED_HOSTTEST_START("MBED_OS");
+    GREENTEA_START();
+    GREENTEA_SETUP(15, "default_auto");
 
     return verbose_test_setup_handler(number_of_cases);
 }
@@ -117,7 +115,7 @@ void greentea_teardown(const size_t passed, const size_t failed, const failure_t
     TEST_ASSERT_EQUAL(REASON_CASE_TEARDOWN, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_CASE_TEARDOWN, failure.location);
 
-    MBED_HOSTTEST_RESULT(true);
+    GREENTEA_TESTSUITE_RESULT(true);
 }
 
 Specification specification(greentea_setup, cases, greentea_teardown, selftest_handlers);
