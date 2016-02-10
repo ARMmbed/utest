@@ -29,6 +29,7 @@ void simple_validation()
     TEST_ASSERT_EQUAL(1, call_counter++);
     Harness::validate_callback();
 }
+
 control_t simple_validation_case()
 {
     TEST_ASSERT_EQUAL(0, call_counter++);
@@ -52,12 +53,14 @@ void multiple_validation()
     Harness::validate_callback();
     TEST_ASSERT_EQUAL(8, call_counter++);
 }
+
 control_t multiple_validation_case()
 {
     TEST_ASSERT_EQUAL(2, call_counter++);
     minar::Scheduler::postCallback(multiple_validation).delay(minar::milliseconds(100));
     return CaseAwait;
 }
+
 status_t multiple_validation_case_teardown(const Case *const source, const size_t passed, const size_t failed, const failure_t failure)
 {
     TEST_ASSERT_EQUAL(1, passed);
@@ -65,7 +68,7 @@ status_t multiple_validation_case_teardown(const Case *const source, const size_
     TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(9, call_counter++);
-    return verbose_case_teardown_handler(source, passed, failed, failure);
+    return greentea_case_teardown_handler(source, passed, failed, failure);
 }
 
 // Validate: Premature Validation -------------------------------------------------------------------------------------
@@ -81,6 +84,7 @@ control_t premature_validation_case()
     Harness::validate_callback();
     return CaseAwait;
 }
+
 status_t premature_validation_case_teardown(const Case *const source, const size_t passed, const size_t failed, const failure_t failure)
 {
     TEST_ASSERT_EQUAL(1, passed);
@@ -88,7 +92,7 @@ status_t premature_validation_case_teardown(const Case *const source, const size
     TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(11, call_counter++);
-    return verbose_case_teardown_handler(source, passed, failed, failure);
+    return greentea_case_teardown_handler(source, passed, failed, failure);
 }
 
 // Validate: Multiple Premature Validation ----------------------------------------------------------------------------
@@ -105,6 +109,7 @@ control_t multiple_premature_validation_case()
     TEST_ASSERT_EQUAL(16, call_counter++);
     return CaseAwait;
 }
+
 status_t multiple_premature_validation_case_teardown(const Case *const source, const size_t passed, const size_t failed, const failure_t failure)
 {
     TEST_ASSERT_EQUAL(1, passed);
@@ -112,7 +117,7 @@ status_t multiple_premature_validation_case_teardown(const Case *const source, c
     TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(17, call_counter++);
-    return verbose_case_teardown_handler(source, passed, failed, failure);
+    return greentea_case_teardown_handler(source, passed, failed, failure);
 }
 
 // Validate: Attributed Validation: Cancel Repeat ---------------------------------------------------------------------
@@ -122,6 +127,7 @@ void attributed_validation_cancel_repeat()
     // cancel all repeats
     Harness::validate_callback(CaseNoRepeat);
 }
+
 control_t attributed_validation_cancel_repeat_case()
 {
     TEST_ASSERT_EQUAL(18, call_counter++);
@@ -129,6 +135,7 @@ control_t attributed_validation_cancel_repeat_case()
     // the RepeatAll will be cancelled during callback validation
     return CaseRepeatAll + CaseAwait;
 }
+
 status_t attributed_validation_cancel_repeat_case_teardown(const Case *const source, const size_t passed, const size_t failed, const failure_t failure)
 {
     TEST_ASSERT_EQUAL(1, passed);
@@ -136,7 +143,7 @@ status_t attributed_validation_cancel_repeat_case_teardown(const Case *const sou
     TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(20, call_counter++);
-    return verbose_case_teardown_handler(source, passed, failed, failure);
+    return greentea_case_teardown_handler(source, passed, failed, failure);
 }
 
 // Validate: Attributed Validation: Enable Repeat Handler -------------------------------------------------------------
@@ -150,6 +157,7 @@ void attributed_validation_enable_repeat()
     Harness::validate_callback(CaseNoRepeat);
     TEST_ASSERT_EQUAL(24, call_counter++);
 }
+
 control_t attributed_validation_enable_repeat_case(const size_t call_count)
 {
     if (call_count == 1) {
@@ -161,6 +169,7 @@ control_t attributed_validation_enable_repeat_case(const size_t call_count)
     TEST_ASSERT_EQUAL(25, call_counter++);
     return CaseNext;
 }
+
 status_t attributed_validation_enable_repeat_case_teardown(const Case *const source, const size_t passed, const size_t failed, const failure_t failure)
 {
     TEST_ASSERT_EQUAL(2, passed);
@@ -168,7 +177,7 @@ status_t attributed_validation_enable_repeat_case_teardown(const Case *const sou
     TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(26, call_counter++);
-    return verbose_case_teardown_handler(source, passed, failed, failure);
+    return greentea_case_teardown_handler(source, passed, failed, failure);
 }
 
 // Cases --------------------------------------------------------------------------------------------------------------
@@ -188,6 +197,7 @@ status_t greentea_setup(const size_t number_of_cases)
 
     return verbose_test_setup_handler(number_of_cases);
 }
+
 void greentea_teardown(const size_t passed, const size_t failed, const failure_t failure)
 {
     TEST_ASSERT_EQUAL(27, call_counter++);
