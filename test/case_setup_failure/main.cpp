@@ -109,8 +109,6 @@ status_t greentea_setup(const size_t number_of_cases)
 
 void greentea_teardown(const size_t passed, const size_t failed, const failure_t failure)
 {
-    verbose_test_teardown_handler(passed, failed, failure);
-
     TEST_ASSERT_EQUAL(7, call_counter);
     TEST_ASSERT_EQUAL(1, passed);
     TEST_ASSERT_EQUAL(2, failed);
@@ -118,7 +116,8 @@ void greentea_teardown(const size_t passed, const size_t failed, const failure_t
     TEST_ASSERT_EQUAL(LOCATION_UNKNOWN, failure.location);
 
     // if the teardown handler was called because
-    if (failure.reason & REASON_CASES) GREENTEA_TESTSUITE_RESULT(true);
+    // if (failure.reason & REASON_CASES) GREENTEA_TESTSUITE_RESULT(true);
+    greentea_test_teardown_handler(passed, failed, failure);
 }
 
 Specification specification(greentea_setup, cases, greentea_teardown, selftest_handlers);

@@ -42,6 +42,7 @@ status_t failing_setup_handler(const size_t number_of_cases)
     greentea_test_setup_handler(number_of_cases);
     return STATUS_ABORT;    // aborting test
 };
+
 // the teardown handler will then be called with the reason `REASON_TEST_SETUP`
 void failing_teardown_handler(const size_t passed, const size_t failed, const failure_t failure)
 {
@@ -51,8 +52,6 @@ void failing_teardown_handler(const size_t passed, const size_t failed, const fa
     TEST_ASSERT_EQUAL(LOCATION_TEST_SETUP, failure.location);
 
     verbose_test_teardown_handler(passed, failed, failure);
-
-    if (failure.reason & REASON_TEST_SETUP) GREENTEA_TESTSUITE_RESULT(true);
 };
 
 Specification specification(failing_setup_handler, cases, failing_teardown_handler, selftest_handlers);
