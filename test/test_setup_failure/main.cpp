@@ -35,10 +35,8 @@ Case cases[] =
 // this setup handler fails
 status_t failing_setup_handler(const size_t number_of_cases)
 {
-    MBED_HOSTTEST_TIMEOUT(5);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(test setup failure test);
-    MBED_HOSTTEST_START("MBED_A1");
+    GREENTEA_START();
+    GREENTEA_SETUP(5, "default_auto");
 
     TEST_ASSERT_EQUAL(2, number_of_cases);
     greentea_test_setup_handler(number_of_cases);
@@ -54,7 +52,7 @@ void failing_teardown_handler(const size_t passed, const size_t failed, const fa
 
     verbose_test_teardown_handler(passed, failed, failure);
 
-    if (failure.reason & REASON_TEST_SETUP) MBED_HOSTTEST_RESULT(true);
+    if (failure.reason & REASON_TEST_SETUP) GREENTEA_TESTSUITE_RESULT(true);
 };
 
 Specification specification(failing_setup_handler, cases, failing_teardown_handler, selftest_handlers);

@@ -64,10 +64,9 @@ control_t test_asynchronous_timeout(const size_t call_count) {
 
 // Custom setup handler required for proper Greentea support
 status_t greentea_setup(const size_t number_of_cases) {
-    MBED_HOSTTEST_TIMEOUT(20);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(utest greentea example);
-    MBED_HOSTTEST_START("MBED_OS");
+    GREENTEA_START();
+    GREENTEA_SETUP(20, "default_auto");
+
     // Call the default reporting function
     return greentea_test_setup_handler(number_of_cases);
 }

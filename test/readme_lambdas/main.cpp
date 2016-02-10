@@ -67,10 +67,9 @@ Case cases[] =
 
  // Declare your test specification with a custom setup handler
 Specification specification([](const size_t number_of_cases) {
-    MBED_HOSTTEST_TIMEOUT(20);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(utest greentea example);
-    MBED_HOSTTEST_START("MBED_OS");
+    GREENTEA_START();
+    GREENTEA_SETUP(20, "default_auto");
+
     // Call the default reporting function
     return greentea_test_setup_handler(number_of_cases);
 }, cases);

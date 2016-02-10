@@ -262,10 +262,8 @@ Case cases[] =
 
 status_t greentea_setup(const size_t number_of_cases)
 {
-    MBED_HOSTTEST_TIMEOUT(5);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(control group test);
-    MBED_HOSTTEST_START("MBED_OS");
+    GREENTEA_START();
+    GREENTEA_SETUP(15, "default_auto");
 
     return greentea_test_setup_handler(number_of_cases);
 };
