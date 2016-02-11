@@ -223,13 +223,14 @@ namespace v1 {
      * This handler is called before execution of any test case and
      * allows you to initialize your common test environment.
      *
+     * @param   cases           the test cases in this test specification
      * @param   number_of_cases the total number of test cases in the test specification
      *
      * @returns
      *    You can return `STATUS_ABORT` if you initialization failed and the test teardown handler will
      *    then be called with the `REASON_SETUP`.
      */
-    typedef status_t (*test_setup_handler_t)(const size_t number_of_cases);
+    typedef status_t (*test_setup_handler_t)(const Case *const cases, const size_t number_of_cases);
 
     /** Test teardown handler.
      *

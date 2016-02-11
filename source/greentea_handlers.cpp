@@ -22,7 +22,7 @@
 
 using namespace utest::v1;
 
-static status_t greentea_unknown_test_setup_handler(const size_t);
+static status_t greentea_unknown_test_setup_handler(const Case *const, const size_t);
 static void greentea_selftest_failure_handler(const failure_t);
 
 
@@ -55,7 +55,7 @@ const handlers_t utest::v1::selftest_handlers = {
 
 
 // --- SPECIAL HANDLERS ---
-static status_t greentea_unknown_test_setup_handler(const size_t) {
+static status_t greentea_unknown_test_setup_handler(const Case *const, const size_t) {
     printf(">>> I do not know how to tell greentea that the test started, since\n");
     printf(">>> you forgot to override the `test_setup_handler` in your specification.\n");
 
@@ -73,10 +73,12 @@ static void greentea_selftest_failure_handler(const failure_t failure) {
 }
 
 // --- GREENTEA HANDLERS ---
-status_t utest::v1::greentea_test_setup_handler(const size_t number_of_cases)
+status_t utest::v1::greentea_test_setup_handler(const Case *const cases, const size_t number_of_cases)
 {
+    // FUTURE FEATURE: report all test cases with their properties to greentea here.
     greentea_send_kv(TEST_ENV_TESTCASE_COUNT, number_of_cases);
-    return verbose_test_setup_handler(number_of_cases);
+    // FUTURE FEATURE: request start case from greentea here and return it from this function.
+    return verbose_test_setup_handler(cases, number_of_cases);
 }
 
 void utest::v1::greentea_test_teardown_handler(const size_t passed, const size_t failed, const failure_t failure)

@@ -80,7 +80,7 @@ bool Harness::run(const Specification& specification)
     failure_t failure(REASON_NONE, location);
 
     if (handlers.test_setup) {
-        setup_status = handlers.test_setup(test_length);
+        setup_status = handlers.test_setup(test_cases, test_length);
         if (setup_status < STATUS_CONTINUE) failure.reason = REASON_TEST_SETUP;
         if (size_t(setup_status) >= specification.length) failure.reason = REASON_START_CASE;
     }

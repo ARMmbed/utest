@@ -37,7 +37,7 @@ static void print_failure(const failure_t failure)
     printf(">>> failure with reason '%s' during '%s'\n", stringify(failure.reason), stringify(failure.location));
 }
 
-status_t utest::v1::verbose_test_setup_handler(const size_t number_of_cases)
+status_t utest::v1::verbose_test_setup_handler(const Case *const, const size_t number_of_cases)
 {
     printf(">>> Running %u test cases...\n", number_of_cases);
     return STATUS_CONTINUE;

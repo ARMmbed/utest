@@ -146,7 +146,7 @@ namespace v1 {
     };
 
     /// Prints the number of tests to run and continues.
-    status_t verbose_test_setup_handler   (const size_t number_of_cases);
+    status_t verbose_test_setup_handler   (const Case *const cases, const size_t number_of_cases);
     /// Prints the number of tests that passed and failed with a reason if provided.
     void     verbose_test_teardown_handler(const size_t passed, const size_t failed, const failure_t failure);
     /// Prints the failure for `REASON_TEST_SETUP` and `REASON_TEST_TEARDOWN` and then dies.
@@ -161,7 +161,7 @@ namespace v1 {
 
     /// Prints a helpful error message and aborts.
     /// This function **NEEDS** to be overridden by the user when using greentea.
-    status_t greentea_test_setup_handler   (const size_t number_of_cases);
+    status_t greentea_test_setup_handler   (const Case *const cases, const size_t number_of_cases);
     /// Reports the test results to greentea.
     void     greentea_test_teardown_handler(const size_t passed, const size_t failed, const failure_t failure);
     /// Reports the failure for `REASON_TEST_SETUP` and `REASON_TEST_TEARDOWN` to greentea and then dies.
