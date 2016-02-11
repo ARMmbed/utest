@@ -51,9 +51,15 @@ void failing_teardown_handler(const size_t passed, const size_t failed, const fa
     TEST_ASSERT_EQUAL(LOCATION_TEST_SETUP, failure.location);
 
     verbose_test_teardown_handler(passed, failed, failure);
-    if (failure.reason & REASON_TEST_SETUP) {
-        GREENTEA_TESTSUITE_RESULT(true);
-    }
+
+    // pretend to greentea that we actally executed two test case
+    greentea_case_setup_handler(cases, 0);
+    greentea_case_teardown_handler(cases, 1, 0, REASON_NONE);
+
+    greentea_case_setup_handler(cases + 1, 0);
+    greentea_case_teardown_handler(cases + 1, 1, 0, REASON_NONE);
+
+    greentea_test_teardown_handler(2, 0, REASON_NONE);
 };
 
 Specification specification(failing_setup_handler, cases, failing_teardown_handler, selftest_handlers);

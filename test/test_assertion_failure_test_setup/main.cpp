@@ -52,7 +52,14 @@ void test_failure_handler(const failure_t failure)
         TEST_ASSERT_EQUAL(REASON_ASSERTION, failure.reason);
         TEST_ASSERT_EQUAL(LOCATION_TEST_SETUP, failure.location);
         verbose_test_failure_handler(failure);
-        GREENTEA_TESTSUITE_RESULT(true);
+
+        // pretend to greentea that we actally executed one test case
+        greentea_case_setup_handler(cases, 0);
+        greentea_case_teardown_handler(cases, 1, 0, REASON_NONE);
+
+        // pretend to greentea that the test was successful
+        greentea_test_teardown_handler(1, 0, REASON_NONE);
+        while(1) ;
     }
     else {
         selftest_handlers.test_failure(failure);

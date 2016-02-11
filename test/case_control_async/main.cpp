@@ -45,7 +45,7 @@ status_t timeout_failure_case_teardown(const Case *const source, const size_t pa
     TEST_ASSERT_EQUAL(1, failed);
     TEST_ASSERT_EQUAL(REASON_CASES, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_UNKNOWN, failure.location);
-    return greentea_case_teardown_handler(source, passed, failed, failure);
+    return greentea_case_teardown_handler(source, passed, 0, REASON_NONE);
 }
 
 // Control: Timeout (Success) -----------------------------------------------------------------------------------------
@@ -186,7 +186,7 @@ void greentea_teardown(const size_t passed, const size_t failed, const failure_t
     TEST_ASSERT_EQUAL(1, failed);
     TEST_ASSERT_EQUAL(REASON_CASES, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_UNKNOWN, failure.location);
-    greentea_test_teardown_handler(passed, failed, failure);
+    greentea_test_teardown_handler(7, 0, REASON_NONE);
 }
 
 Specification specification(greentea_setup, cases, greentea_teardown, selftest_handlers);
