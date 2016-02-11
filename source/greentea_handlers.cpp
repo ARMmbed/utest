@@ -24,7 +24,6 @@ using namespace utest::v1;
 
 static status_t greentea_unknown_test_setup_handler(const size_t);
 static void greentea_selftest_failure_handler(const failure_t);
-static void greentea_test_failure_handler(const failure_t);
 
 
 const handlers_t utest::v1::greentea_abort_handlers = {
@@ -73,14 +72,6 @@ static void greentea_selftest_failure_handler(const failure_t failure) {
     }
 }
 
-static void greentea_test_failure_handler(const failure_t failure) {
-    if (failure.location == LOCATION_TEST_SETUP || failure.location == LOCATION_TEST_TEARDOWN) {
-        verbose_test_failure_handler(failure);
-        GREENTEA_TESTSUITE_RESULT(false);
-        while(1) ;
-    }
-}
-
 // --- GREENTEA HANDLERS ---
 status_t utest::v1::greentea_test_setup_handler(const size_t number_of_cases)
 {
@@ -98,7 +89,11 @@ void utest::v1::greentea_test_teardown_handler(const size_t passed, const size_t
 
 void utest::v1::greentea_test_failure_handler(const failure_t failure)
 {
-    verbose_test_failure_handler(failure);
+    if (failure.location == LOCATION_TEST_SETUP || failure.location == LOCATION_TEST_TEARDOWN) {
+        greentea_test_failure_handler(failure);
+        GREENTEA_TESTSUITE_RESULT(false);
+        while(1) ;
+    }
 }
 
 // --- GREENTEA CASE HANDLERS ---
