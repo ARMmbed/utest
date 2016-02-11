@@ -46,8 +46,8 @@ namespace v1 {
 
     enum status_t {
         STATUS_CONTINUE = 0,    ///< continues testing
-        STATUS_IGNORE = 1,      ///< ignores failure and continues testing
-        STATUS_ABORT = 2        ///< stops testing
+        STATUS_IGNORE = -1,     ///< ignores failure and continues testing
+        STATUS_ABORT = -2       ///< stops testing
     };
 
     enum failure_reason_t {
