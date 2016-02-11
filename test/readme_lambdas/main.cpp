@@ -66,11 +66,11 @@ Case cases[] =
 };
 
  // Declare your test specification with a custom setup handler
-Specification specification([](const size_t number_of_cases) {
+Specification specification([](const Case *const cases, const size_t number_of_cases) {
     GREENTEA_SETUP(20, "default_auto");
 
     // Call the default reporting function
-    return greentea_test_setup_handler(number_of_cases);
+    return greentea_test_setup_handler(cases, number_of_cases);
 }, cases);
 
 void app_start(int, char*[]) {

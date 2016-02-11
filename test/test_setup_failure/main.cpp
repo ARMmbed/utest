@@ -33,12 +33,12 @@ Case cases[] =
 };
 
 // this setup handler fails
-status_t failing_setup_handler(const size_t number_of_cases)
+status_t failing_setup_handler(const Case *const cases, const size_t number_of_cases)
 {
     GREENTEA_SETUP(5, "default_auto");
 
     TEST_ASSERT_EQUAL(2, number_of_cases);
-    greentea_test_setup_handler(number_of_cases);
+    greentea_test_setup_handler(cases, number_of_cases);
     return STATUS_ABORT;    // aborting test
 };
 

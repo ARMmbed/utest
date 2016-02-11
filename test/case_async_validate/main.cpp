@@ -190,11 +190,11 @@ Case cases[] = {
     Case("Validate: Attributed Validation: Enable Repeat Handler", attributed_validation_enable_repeat_case, attributed_validation_enable_repeat_case_teardown)
 };
 
-status_t greentea_setup(const size_t number_of_cases)
+status_t greentea_setup(const Case *const cases, const size_t number_of_cases)
 {
     GREENTEA_SETUP(15, "default_auto");
 
-    return greentea_test_setup_handler(number_of_cases);
+    return greentea_test_setup_handler(cases, number_of_cases);
 }
 
 void greentea_teardown(const size_t passed, const size_t failed, const failure_t failure)
