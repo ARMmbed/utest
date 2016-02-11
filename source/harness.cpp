@@ -56,11 +56,6 @@ static void die() {
 
 bool Harness::run(const Specification& specification)
 {
-    return run(specification, 0);
-}
-
-bool Harness::run(const Specification& specification, std::size_t)
-{
     // check if a specification is currently running
     if (is_busy())
         return false;
