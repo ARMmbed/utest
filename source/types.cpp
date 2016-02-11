@@ -53,6 +53,9 @@ const char* utest::v1::stringify(utest::v1::failure_reason_t reason)
         case REASON_CASE_TEARDOWN:
             string = "Ignored: Case Teardown Failed";
             break;
+        case REASON_START_CASE:
+            string = "Ignored: Start Case Invalid";
+            break;
         default:
         case REASON_UNKNOWN:
             string = "Ignored: Unknown Failure";
