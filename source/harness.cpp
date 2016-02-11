@@ -59,12 +59,8 @@ bool Harness::run(const Specification& specification)
     return run(specification, 0);
 }
 
-bool Harness::run(const Specification& specification, std::size_t start_case)
+bool Harness::run(const Specification& specification, std::size_t)
 {
-    // ignore any invalid start index
-    if (start_case >= specification.length)
-        return false;
-
     // check if a specification is currently running
     if (is_busy())
         return false;
@@ -83,15 +79,25 @@ bool Harness::run(const Specification& specification, std::size_t start_case)
     case_passed = 0;
     case_failed = 0;
     case_failed_before = 0;
-    case_current = &test_cases[start_case];
-    location = LOCATION_TEST_SETUP;
 
-    if (handlers.test_setup && (handlers.test_setup(test_length) != STATUS_CONTINUE)) {
-        if (handlers.test_failure) handlers.test_failure(failure_t(REASON_TEST_SETUP, location));
-        if (handlers.test_teardown) handlers.test_teardown(0, 0, failure_t(REASON_TEST_SETUP, location));
+    location = LOCATION_TEST_SETUP;
+    status_t setup_status = STATUS_CONTINUE;
+    failure_t failure(REASON_NONE, location);
+
+    if (handlers.test_setup) {
+        setup_status = handlers.test_setup(test_length);
+        if (setup_status < STATUS_CONTINUE) failure.reason = REASON_TEST_SETUP;
+        if (size_t(setup_status) >= specification.length) failure.reason = REASON_START_CASE;
+    }
+
+    if (failure.reason != REASON_NONE) {
+        if (handlers.test_failure) handlers.test_failure(failure);
+        if (handlers.test_teardown) handlers.test_teardown(0, 0, failure);
         test_cases = NULL;
         return true;
     }
+
+    case_current = &test_cases[setup_status];
 
     minar::Scheduler::postCallback(run_next_case);
     return true;
