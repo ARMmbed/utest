@@ -44,7 +44,6 @@ namespace v1 {
         const case_teardown_handler_t case_teardown = case_teardown_handler_t(1);
         const case_failure_handler_t  case_failure  = case_failure_handler_t(1);
 
-        operator test_setup_handler_t()    const { return test_setup; }
         operator test_teardown_handler_t() const { return test_teardown; }
         operator test_failure_handler_t()  const { return test_failure; }
 
@@ -61,9 +60,9 @@ namespace v1 {
      */
     const struct
     {
-        const case_handler_t            handler    = case_handler_t(NULL);
-        const case_control_handler_t    control    = case_control_handler_t(NULL);
-        const case_call_count_handler_t call_count = case_call_count_handler_t(NULL);
+        const case_handler_t            handler     = case_handler_t(NULL);
+        const case_control_handler_t    control     = case_control_handler_t(NULL);
+        const case_call_count_handler_t call_count  = case_call_count_handler_t(NULL);
 
         const test_setup_handler_t    test_setup    = test_setup_handler_t(NULL);
         const test_teardown_handler_t test_teardown = test_teardown_handler_t(NULL);
@@ -77,7 +76,6 @@ namespace v1 {
         operator case_control_handler_t()    const { return control; }
         operator case_call_count_handler_t() const { return call_count; }
 
-        operator test_setup_handler_t()    const { return test_setup; }
         operator test_teardown_handler_t() const { return test_teardown; }
         operator test_failure_handler_t()  const { return test_failure; }
 
@@ -118,28 +116,28 @@ namespace v1 {
         case_teardown_handler_t case_teardown;
         case_failure_handler_t case_failure;
 
-        inline test_setup_handler_t get_handler(test_setup_handler_t handler) const {
-            if (handler == default_handler) return test_setup;
+        inline test_setup_handler_t get_test_setup(test_setup_handler_t handler) const {
+            if (handler == default_handler.test_setup) return test_setup;
             return handler;
         }
-        inline test_teardown_handler_t get_handler(test_teardown_handler_t handler) const {
+        inline test_teardown_handler_t get_test_teardown(test_teardown_handler_t handler) const {
             if (handler == default_handler) return test_teardown;
             return handler;
         }
-        inline test_failure_handler_t get_handler(test_failure_handler_t handler) const {
+        inline test_failure_handler_t get_test_failure(test_failure_handler_t handler) const {
             if (handler == default_handler) return test_failure;
             return handler;
         }
 
-        inline case_setup_handler_t get_handler(case_setup_handler_t handler) const {
+        inline case_setup_handler_t get_case_setup(case_setup_handler_t handler) const {
             if (handler == default_handler) return case_setup;
             return handler;
         }
-        inline case_teardown_handler_t get_handler(case_teardown_handler_t handler) const {
+        inline case_teardown_handler_t get_case_teardown(case_teardown_handler_t handler) const {
             if (handler == default_handler) return case_teardown;
             return handler;
         }
-        inline case_failure_handler_t get_handler(case_failure_handler_t handler) const {
+        inline case_failure_handler_t get_case_failure(case_failure_handler_t handler) const {
             if (handler == default_handler) return case_failure;
             return handler;
         }

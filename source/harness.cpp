@@ -63,9 +63,9 @@ bool Harness::run(const Specification& specification)
     test_cases  = specification.cases;
     test_length = specification.length;
     defaults    = specification.defaults;
-    handlers.test_setup    = defaults.get_handler(specification.setup_handler);
-    handlers.test_teardown = defaults.get_handler(specification.teardown_handler);
-    handlers.test_failure  = defaults.get_handler(specification.failure_handler);
+    handlers.test_setup    = defaults.get_test_setup(specification.setup_handler);
+    handlers.test_teardown = defaults.get_test_teardown(specification.teardown_handler);
+    handlers.test_failure  = defaults.get_test_failure(specification.failure_handler);
 
     test_index_of_case = 0;
     test_passed = 0;
@@ -210,9 +210,9 @@ void Harness::run_next_case()
 {
     if(case_current < (test_cases + test_length))
     {
-        handlers.case_setup    = defaults.get_handler(case_current->setup_handler);
-        handlers.case_teardown = defaults.get_handler(case_current->teardown_handler);
-        handlers.case_failure  = defaults.get_handler(case_current->failure_handler);
+        handlers.case_setup    = defaults.get_case_setup(case_current->setup_handler);
+        handlers.case_teardown = defaults.get_case_teardown(case_current->teardown_handler);
+        handlers.case_failure  = defaults.get_case_failure(case_current->failure_handler);
 
         if (case_current->is_empty()) {
             location = LOCATION_UNKNOWN;
