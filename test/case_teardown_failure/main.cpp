@@ -102,7 +102,7 @@ status_t greentea_setup(const size_t number_of_cases)
 {
     GREENTEA_SETUP(15, "default_auto");
 
-    return verbose_test_setup_handler(number_of_cases);
+    return greentea_test_setup_handler(number_of_cases);
 }
 
 void greentea_teardown(const size_t passed, const size_t failed, const failure_t failure)
@@ -113,7 +113,8 @@ void greentea_teardown(const size_t passed, const size_t failed, const failure_t
     TEST_ASSERT_EQUAL(REASON_CASE_TEARDOWN, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_CASE_TEARDOWN, failure.location);
 
-    greentea_test_teardown_handler(passed, failed, failure);
+    // pretend to greentea that the test was successful
+    greentea_test_teardown_handler(3, 0, REASON_NONE);
 }
 
 Specification specification(greentea_setup, cases, greentea_teardown, selftest_handlers);

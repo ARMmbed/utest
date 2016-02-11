@@ -194,7 +194,7 @@ status_t greentea_setup(const size_t number_of_cases)
 {
     GREENTEA_SETUP(15, "default_auto");
 
-    return verbose_test_setup_handler(number_of_cases);
+    return greentea_test_setup_handler(number_of_cases);
 }
 
 void greentea_teardown(const size_t passed, const size_t failed, const failure_t failure)

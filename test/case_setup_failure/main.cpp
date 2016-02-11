@@ -32,7 +32,7 @@ status_t abort_case_setup(const Case *const source, const size_t index_of_case)
 {
     call_counter++;
     TEST_ASSERT_EQUAL(0, index_of_case);
-    verbose_case_setup_handler(source, index_of_case);
+    greentea_case_setup_handler(source, index_of_case);
     return STATUS_ABORT;
 }
 
@@ -44,14 +44,14 @@ status_t abort_case_teardown(const Case *const source, const size_t passed, cons
     TEST_ASSERT_EQUAL(REASON_CASE_SETUP, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_CASE_SETUP, failure.location);
     call_counter++;
-    return greentea_case_teardown_handler(source, passed, failed, failure);
+    return greentea_case_teardown_handler(source, 1, 0, failure);
 }
 
 status_t ignore_case_setup(const Case *const source, const size_t index_of_case)
 {
     TEST_ASSERT_EQUAL(2, call_counter);
     TEST_ASSERT_EQUAL(1, index_of_case);
-    verbose_case_setup_handler(source, index_of_case);
+    greentea_case_setup_handler(source, index_of_case);
     call_counter++;
     return STATUS_IGNORE;   // this is the same
 }
@@ -64,14 +64,14 @@ status_t ignore_case_teardown(const Case *const source, const size_t passed, con
     TEST_ASSERT_EQUAL(REASON_CASE_SETUP, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_CASE_SETUP, failure.location);
     call_counter++;
-    return greentea_case_teardown_handler(source, passed, failed, failure);
+    return greentea_case_teardown_handler(source, 1, 0, failure);
 }
 
 status_t continue_case_setup(const Case *const source, const size_t index_of_case)
 {
     TEST_ASSERT_EQUAL(4, call_counter);
     TEST_ASSERT_EQUAL(2, index_of_case);
-    verbose_case_setup_handler(source, index_of_case);
+    greentea_case_setup_handler(source, index_of_case);
     call_counter++;
     return STATUS_CONTINUE;   // this is the same
 }
@@ -103,7 +103,7 @@ status_t greentea_setup(const size_t number_of_cases)
 {
     GREENTEA_SETUP(15, "default_auto");
 
-    return verbose_test_setup_handler(number_of_cases);
+    return greentea_test_setup_handler(number_of_cases);
 }
 
 void greentea_teardown(const size_t passed, const size_t failed, const failure_t failure)
@@ -114,11 +114,8 @@ void greentea_teardown(const size_t passed, const size_t failed, const failure_t
     TEST_ASSERT_EQUAL(REASON_CASES, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_UNKNOWN, failure.location);
 
-    // if the teardown handler was called because
-    // we expect this case to fail
-    if (failure.reason & REASON_CASES) {
-        GREENTEA_TESTSUITE_RESULT(true);
-    }
+    // pretend to greentea that the test was successful
+    greentea_test_teardown_handler(3, 0, REASON_NONE);
 }
 
 Specification specification(greentea_setup, cases, greentea_teardown, selftest_handlers);
