@@ -67,7 +67,6 @@ Case cases[] =
 
  // Declare your test specification with a custom setup handler
 Specification specification([](const size_t number_of_cases) {
-    GREENTEA_START();
     GREENTEA_SETUP(20, "default_auto");
 
     // Call the default reporting function
