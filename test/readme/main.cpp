@@ -64,7 +64,6 @@ control_t test_asynchronous_timeout(const size_t call_count) {
 
 // Custom setup handler required for proper Greentea support
 status_t greentea_setup(const size_t number_of_cases) {
-    GREENTEA_START();
     GREENTEA_SETUP(20, "default_auto");
 
     // Call the default reporting function

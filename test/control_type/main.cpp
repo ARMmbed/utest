@@ -262,7 +262,6 @@ Case cases[] =
 
 status_t greentea_setup(const size_t number_of_cases)
 {
-    GREENTEA_START();
     GREENTEA_SETUP(15, "default_auto");
 
     return greentea_test_setup_handler(number_of_cases);

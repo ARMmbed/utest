@@ -36,7 +36,6 @@ Case cases[] =
 // this setup handler fails
 status_t failing_setup_handler(const size_t number_of_cases)
 {
-    GREENTEA_START();
     GREENTEA_SETUP(5, "default_auto");
 
     status_t status = greentea_test_setup_handler(number_of_cases);
