@@ -73,13 +73,17 @@ Case cases[] =
     })
 };
 
- // Declare your test specification with a custom setup handler
-Specification specification([](const size_t number_of_cases) {
+
+// Custom setup handler required for proper Greentea support
+status_t greentea_setup(const size_t number_of_cases) {
     GREENTEA_SETUP(20, "default_auto");
 
     // Call the default reporting function
     return greentea_test_setup_handler(number_of_cases);
-}, cases);
+}
+
+ // Declare your test specification with a custom setup handler
+Specification specification(greentea_setup, cases);
 
 void app_start(int, char*[]) {
     Harness::run(specification);
