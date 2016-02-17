@@ -21,12 +21,14 @@
 using namespace utest::v1;
 
 // Specify all your test cases here
+// Specify all your test cases here
 Case cases[] =
 {
-    Case("Simple Test", []() {
-        TEST_ASSERT_EQUAL(0, 0);
-        printf("Simple test called\n");
-    }),
+#ifndef __ARMCC_VERSION
+    // Be aware however, that the following code will not compile on ARMCC 5,
+    // due to incomplete lambda function support.
+    // See: https://github.com/ARMmbed/utest#using-c11-lambda-functions
+
     Case("Repeating Test", [](const Case *const source, const size_t index_of_case) {
         // Call the default handler for proper reporting
         status_t status = greentea_case_setup_handler(source, index_of_case);
@@ -63,6 +65,11 @@ Case cases[] =
             }).delay(minar::milliseconds(100));
         }
         return CaseRepeatHandlerOnTimeout(200);
+    }),
+#endif
+    Case("Simple Test", []() {
+        TEST_ASSERT_EQUAL(0, 0);
+        printf("Simple test called\n");
     })
 };
 
