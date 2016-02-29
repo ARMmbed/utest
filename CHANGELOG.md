@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [1.9.2] - 2016-02-29
+### Fixed
+- calling `raise_failure` before harness is initialized won't have an effect.
+
 ## [1.9.1] - 2016-01-25
 ### Fixed
 - Also check `control_handler` in `Case::is_empty()`.
