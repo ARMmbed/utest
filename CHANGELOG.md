@@ -3,7 +3,14 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-## [1.9.2] - 2016-02-29
+## [1.10.0] - 2016-03-02
+
+### Added
+- support for `greentea-client` APIs: preamble, hand-shake and test suite setup.
+- support for `Greentea` automation tool: Additional KiVi (key-value) prints.
+- separate Greentea handlers section.
+- excluded lambdas (C++11) code failing to compile on ARMCCv5.
+
 ### Fixed
 - calling `raise_failure` before harness is initialized won't have an effect.
 
