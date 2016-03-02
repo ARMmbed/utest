@@ -22,6 +22,6 @@
   },
   "testDependencies": {
     "unity": "^2.0.1",
-    "mbed-drivers": "~0.11.0"
+    "mbed-drivers": "^1.0.0"
   }
 }
