@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 #include "mbed-drivers/mbed.h"
-#include "mbed-drivers/test_env.h"
+#include "greentea-client/test_env.h"
 #include "utest/utest.h"
 #include "unity/unity.h"
 
@@ -35,15 +35,13 @@ Case cases[] =
 // this setup handler fails
 status_t failing_setup_handler(const size_t number_of_cases)
 {
-    MBED_HOSTTEST_TIMEOUT(5);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(test setup failure test);
-    MBED_HOSTTEST_START("MBED_A1");
+    GREENTEA_SETUP(5, "default_auto");
 
     TEST_ASSERT_EQUAL(2, number_of_cases);
     greentea_test_setup_handler(number_of_cases);
     return STATUS_ABORT;    // aborting test
 };
+
 // the teardown handler will then be called with the reason `REASON_TEST_SETUP`
 void failing_teardown_handler(const size_t passed, const size_t failed, const failure_t failure)
 {
@@ -54,7 +52,14 @@ void failing_teardown_handler(const size_t passed, const size_t failed, const fa
 
     verbose_test_teardown_handler(passed, failed, failure);
 
-    if (failure.reason & REASON_TEST_SETUP) MBED_HOSTTEST_RESULT(true);
+    // pretend to greentea that we actally executed two test case
+    greentea_case_setup_handler(cases, 0);
+    greentea_case_teardown_handler(cases, 1, 0, REASON_NONE);
+
+    greentea_case_setup_handler(cases + 1, 0);
+    greentea_case_teardown_handler(cases + 1, 1, 0, REASON_NONE);
+
+    greentea_test_teardown_handler(2, 0, REASON_NONE);
 };
 
 Specification specification(failing_setup_handler, cases, failing_teardown_handler, selftest_handlers);

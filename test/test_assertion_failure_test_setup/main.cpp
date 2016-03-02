@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 #include "mbed-drivers/mbed.h"
-#include "mbed-drivers/test_env.h"
+#include "greentea-client/test_env.h"
 #include "utest/utest.h"
 #include "unity/unity.h"
 
@@ -36,10 +36,7 @@ Case cases[] =
 // this setup handler fails
 status_t failing_setup_handler(const size_t number_of_cases)
 {
-    MBED_HOSTTEST_TIMEOUT(5);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(test assertion failure during test setup);
-    MBED_HOSTTEST_START("MBED_OS");
+    GREENTEA_SETUP(5, "default_auto");
 
     status_t status = greentea_test_setup_handler(number_of_cases);
 
@@ -55,7 +52,14 @@ void test_failure_handler(const failure_t failure)
         TEST_ASSERT_EQUAL(REASON_ASSERTION, failure.reason);
         TEST_ASSERT_EQUAL(LOCATION_TEST_SETUP, failure.location);
         verbose_test_failure_handler(failure);
-        MBED_HOSTTEST_RESULT(true);
+
+        // pretend to greentea that we actally executed one test case
+        greentea_case_setup_handler(cases, 0);
+        greentea_case_teardown_handler(cases, 1, 0, REASON_NONE);
+
+        // pretend to greentea that the test was successful
+        greentea_test_teardown_handler(1, 0, REASON_NONE);
+        while(1) ;
     }
     else {
         selftest_handlers.test_failure(failure);

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 #include "mbed-drivers/mbed.h"
-#include "mbed-drivers/test_env.h"
+#include "greentea-client/test_env.h"
 #include "utest/utest.h"
 #include "unity/unity.h"
 
@@ -106,12 +106,9 @@ Case cases[] = {
 
 status_t greentea_setup(const size_t number_of_cases)
 {
-    MBED_HOSTTEST_TIMEOUT(15);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(case control repeat test);
-    MBED_HOSTTEST_START("MBED_OS");
+    GREENTEA_SETUP(15, "default_auto");
 
-    return verbose_test_setup_handler(number_of_cases);
+    return greentea_test_setup_handler(number_of_cases);
 }
 void greentea_teardown(const size_t passed, const size_t failed, const failure_t failure)
 {

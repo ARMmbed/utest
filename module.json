@@ -18,10 +18,12 @@
   "dependencies": {
     "minar": "^1.0.0",
     "core-util": "^1.0.1",
-    "compiler-polyfill": "^1.2.0"
+    "compiler-polyfill": "^1.2.0",
+    "greentea-client": "~0.1.4"
   },
   "testDependencies": {
     "unity": "^2.0.1",
-    "mbed-drivers": "^1.0.0"
+    "mbed-drivers": "^1.0.0",
+    "greentea-client": "~0.1.4"
   }
 }

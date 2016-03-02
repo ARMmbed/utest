@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "mbed-drivers/test_env.h"
+#include "mbed-drivers/mbed.h"
+#include "greentea-client/test_env.h"
 #include "utest/utest.h"
 #include "unity/unity.h"
 
 using namespace utest::v1;
 
 // Specify all your test cases here
+// Specify all your test cases here
 Case cases[] =
 {
-    Case("Simple Test", []() {
-        TEST_ASSERT_EQUAL(0, 0);
-        printf("Simple test called\n");
-    }),
+#ifndef __ARMCC_VERSION
+    // Be aware however, that the following code will not compile on ARMCC 5,
+    // due to incomplete lambda function support.
+    // See: https://github.com/ARMmbed/utest#using-c11-lambda-functions
+
     Case("Repeating Test", [](const Case *const source, const size_t index_of_case) {
         // Call the default handler for proper reporting
         status_t status = greentea_case_setup_handler(source, index_of_case);
@@ -62,18 +65,25 @@ Case cases[] =
             }).delay(minar::milliseconds(100));
         }
         return CaseRepeatHandlerOnTimeout(200);
+    }),
+#endif
+    Case("Simple Test", []() {
+        TEST_ASSERT_EQUAL(0, 0);
+        printf("Simple test called\n");
     })
 };
 
- // Declare your test specification with a custom setup handler
-Specification specification([](const size_t number_of_cases) {
-    MBED_HOSTTEST_TIMEOUT(20);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(utest greentea example);
-    MBED_HOSTTEST_START("MBED_OS");
+
+// Custom setup handler required for proper Greentea support
+status_t greentea_setup(const size_t number_of_cases) {
+    GREENTEA_SETUP(20, "default_auto");
+
     // Call the default reporting function
     return greentea_test_setup_handler(number_of_cases);
-}, cases);
+}
+
+ // Declare your test specification with a custom setup handler
+Specification specification(greentea_setup, cases);
 
 void app_start(int, char*[]) {
     Harness::run(specification);

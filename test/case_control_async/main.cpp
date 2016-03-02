@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 #include "mbed-drivers/mbed.h"
-#include "mbed-drivers/test_env.h"
+#include "greentea-client/test_env.h"
 #include "utest/utest.h"
 #include "unity/unity.h"
 
@@ -45,7 +45,7 @@ status_t timeout_failure_case_teardown(const Case *const source, const size_t pa
     TEST_ASSERT_EQUAL(1, failed);
     TEST_ASSERT_EQUAL(REASON_CASES, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_UNKNOWN, failure.location);
-    return greentea_case_teardown_handler(source, passed, failed, failure);
+    return greentea_case_teardown_handler(source, passed, 0, REASON_NONE);
 }
 
 // Control: Timeout (Success) -----------------------------------------------------------------------------------------
@@ -175,10 +175,7 @@ Case cases[] = {
 // Specification: Setup & Teardown ------------------------------------------------------------------------------------
 status_t greentea_setup(const size_t number_of_cases)
 {
-    MBED_HOSTTEST_TIMEOUT(15);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(case control asynchronous test);
-    MBED_HOSTTEST_START("MBED_OS");
+    GREENTEA_SETUP(15, "default_auto");
 
     return verbose_test_setup_handler(number_of_cases);
 }
@@ -189,8 +186,7 @@ void greentea_teardown(const size_t passed, const size_t failed, const failure_t
     TEST_ASSERT_EQUAL(1, failed);
     TEST_ASSERT_EQUAL(REASON_CASES, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_UNKNOWN, failure.location);
-    verbose_test_teardown_handler(passed, failed, failure);
-    MBED_HOSTTEST_RESULT(true);
+    greentea_test_teardown_handler(7, 0, REASON_NONE);
 }
 
 Specification specification(greentea_setup, cases, greentea_teardown, selftest_handlers);

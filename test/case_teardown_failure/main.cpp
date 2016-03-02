@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 #include "mbed-drivers/mbed.h"
-#include "mbed-drivers/test_env.h"
+#include "greentea-client/test_env.h"
 #include "utest/utest.h"
 #include "unity/unity.h"
 
@@ -35,7 +35,7 @@ status_t continue_case_teardown(const Case *const source, const size_t passed, c
     TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(1, call_counter++);
-    return verbose_case_teardown_handler(source, passed, failed, failure);
+    return greentea_case_teardown_handler(source, passed, failed, failure);
 }
 status_t continue_failure(const Case *const, const failure_t)
 {
@@ -55,7 +55,7 @@ status_t ignore_case_teardown(const Case *const source, const size_t passed, con
     TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(3, call_counter++);
-    verbose_case_teardown_handler(source, passed, failed, failure);
+    greentea_case_teardown_handler(source, passed, failed, failure);
     return STATUS_ABORT;
 }
 status_t ignore_failure(const Case *const source, const failure_t failure)
@@ -79,7 +79,7 @@ status_t abort_case_teardown(const Case *const source, const size_t passed, cons
     TEST_ASSERT_EQUAL(REASON_NONE, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_NONE, failure.location);
     TEST_ASSERT_EQUAL(6, call_counter++);
-    verbose_case_teardown_handler(source, passed, failed, failure);
+    greentea_case_teardown_handler(source, passed, failed, failure);
     return STATUS_ABORT;
 }
 status_t abort_failure(const Case *const source, const failure_t failure)
@@ -100,24 +100,21 @@ Case cases[] = {
 // Specification: Setup & Teardown ------------------------------------------------------------------------------------
 status_t greentea_setup(const size_t number_of_cases)
 {
-    MBED_HOSTTEST_TIMEOUT(5);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(case setup failure test);
-    MBED_HOSTTEST_START("MBED_OS");
+    GREENTEA_SETUP(15, "default_auto");
 
-    return verbose_test_setup_handler(number_of_cases);
+    return greentea_test_setup_handler(number_of_cases);
 }
+
 void greentea_teardown(const size_t passed, const size_t failed, const failure_t failure)
 {
-    verbose_test_teardown_handler(passed, failed, failure);
-
     TEST_ASSERT_EQUAL(8, call_counter++);
     TEST_ASSERT_EQUAL(2, passed);
     TEST_ASSERT_EQUAL(1, failed);
     TEST_ASSERT_EQUAL(REASON_CASE_TEARDOWN, failure.reason);
     TEST_ASSERT_EQUAL(LOCATION_CASE_TEARDOWN, failure.location);
 
-    MBED_HOSTTEST_RESULT(true);
+    // pretend to greentea that the test was successful
+    greentea_test_teardown_handler(3, 0, REASON_NONE);
 }
 
 Specification specification(greentea_setup, cases, greentea_teardown, selftest_handlers);
