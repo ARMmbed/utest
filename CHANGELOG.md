@@ -3,17 +3,25 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [1.10.1] - 2016-03-15
+
+### Added
+- Coverage configuration file.
+
+### Fixed
+- Removed duplicate dependency.
+
 ## [1.10.0] - 2016-03-02
 
 ### Added
-- support for `greentea-client` APIs: preamble, hand-shake and test suite setup.
-- support for `Greentea` automation tool: Additional KiVi (key-value) prints.
-- separate Greentea handlers section.
-- excluded lambdas (C++11) code failing to compile on ARMCCv5.
+- Support for `greentea-client` APIs: preamble, hand-shake and test suite setup.
+- Support for `Greentea` automation tool: Additional KiVi (key-value) prints.
+- Separate Greentea handlers section.
+- Excluded lambdas (C++11) code failing to compile on ARMCCv5.
 
 ## [1.9.2] - 2016-02-29
 ### Fixed
-- calling `raise_failure` before harness is initialized won't have an effect.
+- Calling `raise_failure` before harness is initialized won't have an effect.
 
 ## [1.9.1] - 2016-01-25
 ### Fixed
@@ -141,7 +149,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - v1 of this small test harness. See Readme.
 
-[Unreleased]: https://github.com/ARMmbed/utest/compare/v1.10.0...HEAD
+[Unreleased]: https://github.com/ARMmbed/utest/compare/v1.10.1...HEAD
+[1.10.1]: https://github.com/ARMmbed/utest/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/ARMmbed/utest/compare/v1.9.2...v1.10.0
 [1.9.2]: https://github.com/ARMmbed/utest/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/ARMmbed/utest/compare/v1.9.0...v1.9.1
