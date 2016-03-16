@@ -3,8 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-## [1.10.1] - 2016-03-15
+## [1.11.0] - 2016-03-16
+### Added
+- Updated dependency on greentea-client.
 
+## [1.10.1] - 2016-03-15
 ### Added
 - Coverage configuration file.
 
@@ -12,7 +15,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Removed duplicate dependency.
 
 ## [1.10.0] - 2016-03-02
-
 ### Added
 - Support for `greentea-client` APIs: preamble, hand-shake and test suite setup.
 - Support for `Greentea` automation tool: Additional KiVi (key-value) prints.
