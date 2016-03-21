@@ -1,6 +1,6 @@
-# utest: A Simple C++ Test Harness
+# utest: Asynchronous C++ Test Harness
 
-This [lest-inspired](https://github.com/martinmoene/lest) test harness allows you to execute a specified series of (asynchronous) C++ test cases with sensible default reporting and useful customization options.
+This test harness allows you to execute a specified series of (asynchronous) C++ test cases with sensible default reporting and useful customization options.
 
 Please note that this is a purposefully lean test harness, only dealing with test execution and providing default reporting handlers. It specifically does not support auto-discovery of test cases and does not provide you with test macros or other convenience functions.
 Instead, the macros in the [unity module](https://github.com/ARMmbed/unity) can be used for this purpose. However, you are not required to use these, and can use your own macros if you wish.
