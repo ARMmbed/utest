@@ -227,6 +227,7 @@ The failure reasons are:
 - `REASON_CASE_HANDLER`: Case handler failed
 - `REASON_CASE_TEARDOWN`: Case teardown failed
 - `REASON_CASE_INDEX`: Case index returned from test setup or case teardown handler is invalid
+- `REASON_SCHEDULER`: Underlying scheduler is not asynchronous
 
 The failure locations are:
 
