@@ -382,4 +382,100 @@ Specification specification([](const size_t number_of_cases) {
 void app_start(int, char*[]) {
     Harness::run(specification);
 }
+
+### Custom Scheduler
+
+By default the [MINAR scheduler](https://github.com/armmbed/minar) is used for scheduling the harness operations.
+In case MINAR is not available you can provide your own custom scheduler implementation and make the harness use it with the `Harness::set_scheduler(your_custom_implementation)` function.
+
+The scheduler requirements are very simple: Execute a `void(void)` function in you main loop (with a delay of *N* ms). Only one function is scheduled by the harnet *at any given time*.
+Note that you do not need to implement the delay functionality, if your tests do not require timeouts. You will still be able to use repeating test cases, but an error is thrown if your tests attempt to use a timeout, when your underlying scheduler does not support it.
+
+There are two functions you need to implement:
+
+- `void* post_callback(const utest_v1_harness_callback_t callback, const uint32_t delay_ms)`: schedules a `void(void)` callback function in *N* ms.
+- `int32_t cancel_callback_t(void *handle)`: cancels an asynchronous callback.
+
+Please see [their doxygen documentation for implementation details](utest/scheduler.h).
+
+### Example Synchronous Scheduler
+
+Here is the most [basic scheduler implementation without any asynchronous support](test/minimal_scheduler/main.cpp). Note that this does not require any hardware support at all, but you cannot use timeouts in your test cases!
+```cpp
+volatile utest_v1_harness_callback_t minimal_callback;
+
+static void* utest_minimal_post(const utest_v1_harness_callback_t callback, const uint32_t delay_ms) {
+    minimal_callback = callback;
+    // this scheduler does not support asynchronous callbacks
+    return (delay_ms ? NULL : (void*)1);
+}
+static int32_t utest_minimal_cancel(void*) {
+    return -1;  // canceling not supported either
+}
+static const utest_v1_scheduler_t utest_minimal_scheduler = {utest_minimal_post, utest_minimal_cancel};
+
+// [...] Add your test cases and specification here.
+
+void main() // or whatever your custom entry point is
+{
+    // You MUST set the custom scheduler before running the specification.
+    Harness::set_scheduler(utest_minimal_scheduler);
+    Harness::run(specification);
+
+    while(1) {
+        if (minimal_callback) {
+            // copy the callback and reset the shared memory
+            utest_v1_harness_callback_t callback = minimal_callback;
+            minimal_callback = NULL;
+            callback(); // execute the copied callback
+        }
+    }
+}
+```
+
+### Example Asynchronous Scheduler
+
+Here is the a [complete scheduler implementation with any asynchronous support](test/minimal_scheduler_async/main.cpp). Note that this does require at least a hardware timer, in this case we have used `mbed-hal/us_ticker`! Note that you must not execute the callback in the timer interrupt context, but in the main loop context!
+```cpp
+volatile utest_v1_harness_callback_t minimal_callback;
+volatile utest_v1_harness_callback_t ticker_callback;
+const ticker_data_t *ticker_data;
+ticker_event_t ticker_event;
+
+static void ticker_handler(uint32_t) {
+    minimal_callback = ticker_callback; // interrupt context!
+}
+static void* utest_minimal_post(const utest_v1_harness_callback_t callback, const uint32_t delay_ms) {
+    if (delay_ms) {
+        ticker_callback = callback;
+        ticker_insert_event(ticker_data, &ticker_event, ticker_read(ticker_data) + delay_ms * 1000, 0);
+    }
+    else minimal_callback = callback;
+    return (void*)1;
+}
+static int32_t utest_minimal_cancel(void*) {
+    ticker_remove_event(ticker_data, &ticker_event);
+    return 0;   // canceling is supported
+}
+static const utest_v1_scheduler_t utest_minimal_scheduler = {utest_minimal_post, utest_minimal_cancel};
+
+// [...] Add your test cases and specification here.
+
+void main() // or whatever your custom entry point is
+{
+    ticker_data = get_us_ticker_data(); // initialize the ticker data.
+    ticker_set_handler(ticker_data, ticker_handler);
+    // You MUST set the custom scheduler before running the specification.
+    Harness::set_scheduler(utest_minimal_scheduler);
+    Harness::run(specification);
+
+    while(1) {
+        if (minimal_callback) {
+            // copy the callback and reset the shared memory
+            utest_v1_harness_callback_t callback = minimal_callback;
+            minimal_callback = NULL;
+            callback(); // execute the copied callback
+        }
+    }
+}
 ```
