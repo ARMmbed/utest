@@ -5,8 +5,6 @@ This [lest-inspired](https://github.com/martinmoene/lest) test harness allows yo
 Please note that this is a purposefully lean test harness, only dealing with test execution and providing default reporting handlers. It specifically does not support auto-discovery of test cases and does not provide you with test macros or other convenience functions.
 Instead, the macros in the [unity module](https://github.com/ARMmbed/unity) can be used for this purpose. However, you are not required to use these, and can use your own macros if you wish.
 
-It is recommended to use C++11 lambda functions (with an empty closure!) to make the specification a lot simpler to write. Please note, that ARMCC 5 does not fully support lambda functions, so this is only recommended for targets that require GCC exclusively.
-
 Furthermore, test failure recovery through the use of exceptions or `longjmp` is not supported; the test will either continue and ignore failures or die by busy-waiting.
 
 ## Theory of Operation
@@ -325,64 +323,6 @@ This means you can write test cases that poll for interrupts to be completed ins
 
 If you setup an interrupt that validates its callback using `Harness::validate_callback()` inside a test case and it fires before the test case completed, the validation will be buffered.
 If the test case then returns a timeout value, but the callback is already validated, the test harness just continues normally.
-
-### Using C++11 lambda functions
-
-The above example can we written more compactly with C++11 lambda functions. This works because lambda functions with an empty closure are cast to a C-style function pointer and can therefore be transparently used with the utest harness.
-Be aware however, that the following code will not compile on ARMCC 5, due to incomplete lambda function support.
-So if you want to support the ARMCC toolchain, you unfortunately cannot use lambda functions.
-
-```cpp
-#include "mbed-drivers/test_env.h"
-#include "utest/utest.h"
-#include "unity/unity.h"
-
-using namespace utest::v1;
-
-Case cases[] = {
-    Case("Simple Test", []() {
-        TEST_ASSERT_EQUAL(0, 0);
-        printf("Simple test called\n");
-    }),
-    Case("Repeating Test", [](const Case *const source, const size_t index_of_case) {
-        status_t status = greentea_case_setup_handler(source, index_of_case);
-        printf("Setting up for '%s'\n", source->get_description());
-        return status;
-    },
-    [](const size_t call_count) {
-        printf("Called for the %u. time\n", call_count);
-        TEST_ASSERT_NOT_EQUAL(3, call_count);
-        return (call_count < 2) ? CaseRepeatAll : CaseNext;
-    }),
-    Case("Asynchronous Test (200ms timeout)", []() {
-        TEST_ASSERT_TRUE_MESSAGE(true, "(true == false) o_O");
-        minar::Scheduler::postCallback([]() {
-                Harness::validate_callback();
-            }).delay(minar::milliseconds(100));
-        return CaseTimeout(200);
-    }),
-    Case("Asynchronous Timeout Repeat", [](const size_t call_count) -> control_t {
-        TEST_ASSERT_TRUE_MESSAGE(true, "(true == false) o_O");
-        if (call_count >= 5) {
-            minar::Scheduler::postCallback([]() {
-                    Harness::validate_callback();
-                }).delay(minar::milliseconds(100));
-        }
-        return CaseRepeatHandlerOnTimeout(200);
-    })
-};
-
-Specification specification([](const size_t number_of_cases) {
-    MBED_HOSTTEST_TIMEOUT(20);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(utest greentea example);
-    MBED_HOSTTEST_START("MBED_OS");
-    return greentea_test_setup_handler(number_of_cases);
-}, cases);
-
-void app_start(int, char*[]) {
-    Harness::run(specification);
-}
 
 ### Custom Scheduler
 
