@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+## [1.12.1] - 2016-03-16
+### Added
+- `exit(test_result)` after harness finished execution.
+
+## [1.12.0] - 2016-03-23
+- Release of mbed OS 16.03.
+
 ## [1.11.0] - 2016-03-16
 ### Added
 - Updated dependency on greentea-client.
