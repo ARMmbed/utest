@@ -19,6 +19,8 @@
 #include "utest/default_handlers.h"
 #include "utest/case.h"
 #include "greentea-client/test_env.h"
+#include <string.h>
+#include <stdlib.h>
 
 using namespace utest::v1;
 
@@ -85,7 +87,25 @@ static void test_failure_handler(const failure_t failure) {
 status_t utest::v1::greentea_test_setup_handler(const size_t number_of_cases)
 {
     greentea_send_kv(TEST_ENV_TESTCASE_COUNT, number_of_cases);
-    return verbose_test_setup_handler(number_of_cases);
+    char key[18];
+    char value[5];
+    // tell htrun to start from testcase 0 (default)
+    greentea_send_kv("__test_start_from", 0);
+    // ask htrun for the start case
+    greentea_send_kv("__testcase_number", "get");
+    // receive the response for it
+    greentea_parse_kv(key, value, 18, 5);
+    // get the return code of the verbose handler
+    status_t status = verbose_test_setup_handler(number_of_cases);
+    // if the verbose handler says continue
+    if ((status >= STATUS_CONTINUE) && (!strcmp(key, "__testcase_number"))){
+        // parse the start case string into an integer
+        int start_case = atoi(value);
+        // if the start case integer is positive, return it.
+        if (start_case >= 0) return status_t(start_case);
+    }
+    // otherwise return what the verbose handler said.
+    return status;
 }
 
 void utest::v1::greentea_test_teardown_handler(const size_t passed, const size_t failed, const failure_t failure)
@@ -112,7 +132,23 @@ status_t utest::v1::greentea_case_setup_handler(const Case *const source, const 
 status_t utest::v1::greentea_case_teardown_handler(const Case *const source, const size_t passed, const size_t failed, const failure_t failure)
 {
     greentea_send_kv(TEST_ENV_TESTCASE_FINISH, source->get_description(), passed, failed);
-    return verbose_case_teardown_handler(source, passed, failed, failure);
+    char key[18];
+    char value[5];
+    // ask htrun for the start case
+    greentea_send_kv("__testcase_number", "get");
+    // receive the response for it
+    greentea_parse_kv(key, value, 18, 5);
+    // get the return code of the verbose handler
+    status_t status = verbose_case_teardown_handler(source, passed, failed, failure);
+    // if the verbose handler says continue
+    if ((status >= STATUS_CONTINUE) && (!strcmp(key, "__testcase_number"))){
+        // parse the start case string into an integer
+        int next_case = atoi(value);
+        // if the start case integer is positive, return it.
+        if (next_case >= 0) return status_t(next_case);
+    }
+    // otherwise return what the verbose handler said.
+    return status;
 }
 
 status_t utest::v1::greentea_case_failure_abort_handler(const Case *const source, const failure_t failure)
