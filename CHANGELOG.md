@@ -3,7 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-## [1.12.1] - 2016-03-16
+## [1.12.2] - 2016-03-31
+### Added
+- Also `exit(1)` on test failure.
+
+## [1.12.1] - 2016-03-30
 ### Added
 - `exit(test_result)` after harness finished execution.
 
@@ -158,7 +162,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - v1 of this small test harness. See Readme.
 
-[Unreleased]: https://github.com/ARMmbed/utest/compare/v1.10.1...HEAD
+[Unreleased]: https://github.com/ARMmbed/utest/compare/v1.12.2...HEAD
+[1.12.2]: https://github.com/ARMmbed/utest/compare/v1.12.1...v1.12.2
+[1.12.1]: https://github.com/ARMmbed/utest/compare/v1.12.0...v1.12.1
+[1.12.0]: https://github.com/ARMmbed/utest/compare/v1.11.0...v1.12.0
+[1.11.0]: https://github.com/ARMmbed/utest/compare/v1.10.1...v1.11.0
+[1.10.1]: https://github.com/ARMmbed/utest/compare/v1.10.0...v1.10.1
 [1.10.1]: https://github.com/ARMmbed/utest/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/ARMmbed/utest/compare/v1.9.2...v1.10.0
 [1.9.2]: https://github.com/ARMmbed/utest/compare/v1.9.1...v1.9.2
