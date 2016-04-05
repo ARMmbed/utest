@@ -34,23 +34,15 @@ namespace v1 {
      * This type automatically casts itself into the appropriate handler type, when possible.
      * Use the constants to default a handler unambigously.
      */
-    const struct
+    static const struct
     {
-        const test_setup_handler_t    test_setup    = test_setup_handler_t(1);
-        const test_teardown_handler_t test_teardown = test_teardown_handler_t(1);
-        const test_failure_handler_t  test_failure  = test_failure_handler_t(1);
+        operator test_setup_handler_t()    const { return test_setup_handler_t(1); }
+        operator test_teardown_handler_t() const { return test_teardown_handler_t(1); }
+        operator test_failure_handler_t()  const { return test_failure_handler_t(1); }
 
-        const case_setup_handler_t    case_setup    = case_setup_handler_t(1);
-        const case_teardown_handler_t case_teardown = case_teardown_handler_t(1);
-        const case_failure_handler_t  case_failure  = case_failure_handler_t(1);
-
-        operator test_setup_handler_t()    const { return test_setup; }
-        operator test_teardown_handler_t() const { return test_teardown; }
-        operator test_failure_handler_t()  const { return test_failure; }
-
-        operator case_setup_handler_t()    const { return case_setup; }
-        operator case_teardown_handler_t() const { return case_teardown; }
-        operator case_failure_handler_t()  const { return case_failure; }
+        operator case_setup_handler_t()    const { return case_setup_handler_t(1); }
+        operator case_teardown_handler_t() const { return case_teardown_handler_t(1); }
+        operator case_failure_handler_t()  const { return case_failure_handler_t(1); }
     } default_handler;
 
     /** Ignore handler hint.
@@ -59,31 +51,19 @@ namespace v1 {
      * This type automatically casts itself into the appropriate handler type, when possible.
      * Use the constants to ignore a handler unambigously.
      */
-    const struct
+    static const struct
     {
-        const case_handler_t            handler    = case_handler_t(NULL);
-        const case_control_handler_t    control    = case_control_handler_t(NULL);
-        const case_call_count_handler_t call_count = case_call_count_handler_t(NULL);
+        operator case_handler_t()            const { return case_handler_t(NULL); }
+        operator case_control_handler_t()    const { return case_control_handler_t(NULL); }
+        operator case_call_count_handler_t() const { return case_call_count_handler_t(NULL); }
 
-        const test_setup_handler_t    test_setup    = test_setup_handler_t(NULL);
-        const test_teardown_handler_t test_teardown = test_teardown_handler_t(NULL);
-        const test_failure_handler_t  test_failure  = test_failure_handler_t(NULL);
+        operator test_setup_handler_t()    const { return test_setup_handler_t(NULL); }
+        operator test_teardown_handler_t() const { return test_teardown_handler_t(NULL); }
+        operator test_failure_handler_t()  const { return test_failure_handler_t(NULL); }
 
-        const case_setup_handler_t    case_setup    = case_setup_handler_t(NULL);
-        const case_teardown_handler_t case_teardown = case_teardown_handler_t(NULL);
-        const case_failure_handler_t  case_failure  = case_failure_handler_t(NULL);
-
-        operator case_handler_t()            const { return handler; }
-        operator case_control_handler_t()    const { return control; }
-        operator case_call_count_handler_t() const { return call_count; }
-
-        operator test_setup_handler_t()    const { return test_setup; }
-        operator test_teardown_handler_t() const { return test_teardown; }
-        operator test_failure_handler_t()  const { return test_failure; }
-
-        operator case_setup_handler_t()    const { return case_setup; }
-        operator case_teardown_handler_t() const { return case_teardown; }
-        operator case_failure_handler_t()  const { return case_failure; }
+        operator case_setup_handler_t()    const { return case_setup_handler_t(NULL); }
+        operator case_teardown_handler_t() const { return case_teardown_handler_t(NULL); }
+        operator case_failure_handler_t()  const { return case_failure_handler_t(NULL); }
     } ignore_handler;
 
     /** A table of handlers.
@@ -149,8 +129,8 @@ namespace v1 {
     status_t verbose_test_setup_handler   (const size_t number_of_cases);
     /// Prints the number of tests that passed and failed with a reason if provided.
     void     verbose_test_teardown_handler(const size_t passed, const size_t failed, const failure_t failure);
-    /// Prints the failure.
-    void     verbose_test_failure_handler(const failure_t failure);
+    /// Prints the failure for `REASON_TEST_SETUP` and `REASON_TEST_TEARDOWN` and then dies.
+    void     verbose_test_failure_handler (const failure_t failure);
 
     /// Prints the index and description of the case being run and continues.
     status_t verbose_case_setup_handler   (const Case *const source, const size_t index_of_case);
@@ -159,22 +139,21 @@ namespace v1 {
     /// Prints the reason of the failure and continues, unless the teardown handler failed, for which it aborts.
     status_t verbose_case_failure_handler (const Case *const source, const failure_t reason);
 
-    /// Prints a helpful error message and aborts.
-    /// This function **NEEDS** to be overridden by the user when using greentea.
+    /// Requests the start test case from greentea and continues.
     status_t greentea_test_setup_handler   (const size_t number_of_cases);
-    /// Calls `verbose_test_teardown_handler` and then prints the greentea failure and success and end strings.
+    /// Reports the test results to greentea.
     void     greentea_test_teardown_handler(const size_t passed, const size_t failed, const failure_t failure);
-    /// Does nothing. Use this for forwards compatibility.
-    void     greentea_test_failure_handler(const failure_t failure);
+    /// Reports the failure for `REASON_TEST_SETUP` and `REASON_TEST_TEARDOWN` to greentea and then dies.
+    void     greentea_test_failure_handler (const failure_t failure);
 
-    /// Forwards to `verbose_case_setup_handler`. Use this for forwards compatibility.
+    /// Registers the test case setup with greentea.
     status_t greentea_case_setup_handler   (const Case *const source, const size_t index_of_case);
-    /// Forwards to `verbose_case_teardown_handler`. Use this for forwards compatibility.
+    /// Registers the test case teardown with greentea.
     status_t greentea_case_teardown_handler(const Case *const source, const size_t passed, const size_t failed, const failure_t failure);
-    /// Calls `verbose_case_failure_handler` but then aborts.
-    status_t greentea_case_failure_abort_handler (const Case *const source, const failure_t reason);
-    /// Forwards to `verbose_case_failure_handler`. Use this for forwards compatibility.
-    status_t greentea_case_failure_continue_handler (const Case *const source, const failure_t reason);
+    /// Reports the failure to greentea and then aborts.
+    status_t greentea_case_failure_abort_handler   (const Case *const source, const failure_t reason);
+    /// Reports the failure to greentea and then continues.
+    status_t greentea_case_failure_continue_handler(const Case *const source, const failure_t reason);
 
     /// The verbose default handlers that always continue on failure
     extern const handlers_t verbose_continue_handlers;

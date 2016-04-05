@@ -45,9 +45,9 @@ namespace v1 {
     };
 
     enum status_t {
-        STATUS_CONTINUE = 0,    ///< continues testing
-        STATUS_IGNORE = 1,      ///< ignores failure and continues testing
-        STATUS_ABORT = 2        ///< stops testing
+        STATUS_CONTINUE = -1,   ///< continues testing
+        STATUS_IGNORE = -2,     ///< ignores failure and continues testing
+        STATUS_ABORT = -3       ///< stops testing
     };
 
     enum failure_reason_t {
@@ -65,6 +65,9 @@ namespace v1 {
         REASON_CASE_HANDLER  = (1 << 8),    ///< Case handler failed
         REASON_CASE_TEARDOWN = (1 << 9),    ///< Case teardown failed
 
+        REASON_CASE_INDEX    = (1 << 10),   ///< Case index out-of-range
+        REASON_SCHEDULER     = (1 << 11),   ///< Asynchronous callback scheduling failed
+
         REASON_IGNORE        = 0x8000       ///< The failure may be ignored
     };
 
@@ -80,8 +83,9 @@ namespace v1 {
 
     /// Contains the reason and location of the failure.
     struct failure_t {
-        failure_t(failure_reason_t reason) : reason(reason) {}
-        failure_t(location_t location) : location(location) {}
+        failure_t() : reason(REASON_NONE), location(LOCATION_NONE) {}
+        failure_t(failure_reason_t reason) : reason(reason), location(LOCATION_NONE) {}
+        failure_t(location_t location) : reason(REASON_NONE), location(location) {}
         failure_t(failure_reason_t reason, location_t location) : reason(reason), location(location) {}
 
         /// @returns a copy of the failure with the reason ignored.
@@ -89,8 +93,8 @@ namespace v1 {
             return failure_t(failure_reason_t(reason | REASON_IGNORE), location);
         }
 
-        failure_reason_t reason = REASON_NONE;
-        location_t location = LOCATION_NONE;
+        failure_reason_t reason;
+        location_t location;
     };
 
 

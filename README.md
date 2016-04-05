@@ -1,11 +1,9 @@
-# utest: A Simple C++ Test Harness
+# utest: Asynchronous C++ Test Harness
 
-This [lest-inspired](https://github.com/martinmoene/lest) test harness allows you to execute a specified series of (asynchronous) C++ test cases with sensible default reporting and useful customization options.
+This test harness allows you to execute a specified series of (asynchronous) C++ test cases with sensible default reporting and useful customization options.
 
 Please note that this is a purposefully lean test harness, only dealing with test execution and providing default reporting handlers. It specifically does not support auto-discovery of test cases and does not provide you with test macros or other convenience functions.
 Instead, the macros in the [unity module](https://github.com/ARMmbed/unity) can be used for this purpose. However, you are not required to use these, and can use your own macros if you wish.
-
-It is recommended to use C++11 lambda functions (with an empty closure!) to make the specification a lot simpler to write. Please note, that ARMCC 5 does not fully support lambda functions, so this is only recommended for targets that require GCC exclusively.
 
 Furthermore, test failure recovery through the use of exceptions or `longjmp` is not supported; the test will either continue and ignore failures or die by busy-waiting.
 
@@ -81,10 +79,7 @@ control_t test_asynchronous_timeout(const size_t call_count) {
 
 // Custom setup handler required for proper Greentea support
 status_t greentea_setup(const size_t number_of_cases) {
-    MBED_HOSTTEST_TIMEOUT(20);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(utest greentea example);
-    MBED_HOSTTEST_START("MBED_OS");
+    GREENTEA_SETUP(20, "default_auto");
     // Call the default reporting function
     return greentea_test_setup_handler(number_of_cases);
 }
@@ -226,6 +221,8 @@ The failure reasons are:
 - `REASON_CASE_SETUP`: Case setup failed
 - `REASON_CASE_HANDLER`: Case handler failed
 - `REASON_CASE_TEARDOWN`: Case teardown failed
+- `REASON_CASE_INDEX`: Case index returned from test setup or case teardown handler is invalid
+- `REASON_SCHEDULER`: Underlying scheduler is not asynchronous
 
 The failure locations are:
 
@@ -324,61 +321,99 @@ This means you can write test cases that poll for interrupts to be completed ins
 If you setup an interrupt that validates its callback using `Harness::validate_callback()` inside a test case and it fires before the test case completed, the validation will be buffered.
 If the test case then returns a timeout value, but the callback is already validated, the test harness just continues normally.
 
-### Using C++11 lambda functions
+### Custom Scheduler
 
-The above example can we written more compactly with C++11 lambda functions. This works because lambda functions with an empty closure are cast to a C-style function pointer and can therefore be transparently used with the utest harness.
-Be aware however, that the following code will not compile on ARMCC 5, due to incomplete lambda function support.
-So if you want to support the ARMCC toolchain, you unfortunately cannot use lambda functions.
+By default the [MINAR scheduler](https://github.com/armmbed/minar) is used for scheduling the harness operations.
+In case MINAR is not available you can provide your own custom scheduler implementation and make the harness use it with the `Harness::set_scheduler(your_custom_implementation)` function.
 
+The scheduler requirements are very simple: Execute a `void(void)` function in you main loop (with a delay of *N* ms). Only one function is scheduled by the harnet *at any given time*.
+Note that you do not need to implement the delay functionality, if your tests do not require timeouts. You will still be able to use repeating test cases, but an error is thrown if your tests attempt to use a timeout, when your underlying scheduler does not support it.
+
+There are two functions you need to implement:
+
+- `void* post_callback(const utest_v1_harness_callback_t callback, const uint32_t delay_ms)`: schedules a `void(void)` callback function in *N* ms.
+- `int32_t cancel_callback_t(void *handle)`: cancels an asynchronous callback.
+
+Please see [their doxygen documentation for implementation details](utest/scheduler.h).
+
+### Example Synchronous Scheduler
+
+Here is the most [basic scheduler implementation without any asynchronous support](test/minimal_scheduler/main.cpp). Note that this does not require any hardware support at all, but you cannot use timeouts in your test cases!
 ```cpp
-#include "mbed-drivers/test_env.h"
-#include "utest/utest.h"
-#include "unity/unity.h"
+volatile utest_v1_harness_callback_t minimal_callback;
 
-using namespace utest::v1;
+static void* utest_minimal_post(const utest_v1_harness_callback_t callback, const uint32_t delay_ms) {
+    minimal_callback = callback;
+    // this scheduler does not support asynchronous callbacks
+    return (delay_ms ? NULL : (void*)1);
+}
+static int32_t utest_minimal_cancel(void*) {
+    return -1;  // canceling not supported either
+}
+static const utest_v1_scheduler_t utest_minimal_scheduler = {utest_minimal_post, utest_minimal_cancel};
 
-Case cases[] = {
-    Case("Simple Test", []() {
-        TEST_ASSERT_EQUAL(0, 0);
-        printf("Simple test called\n");
-    }),
-    Case("Repeating Test", [](const Case *const source, const size_t index_of_case) {
-        status_t status = greentea_case_setup_handler(source, index_of_case);
-        printf("Setting up for '%s'\n", source->get_description());
-        return status;
-    },
-    [](const size_t call_count) {
-        printf("Called for the %u. time\n", call_count);
-        TEST_ASSERT_NOT_EQUAL(3, call_count);
-        return (call_count < 2) ? CaseRepeatAll : CaseNext;
-    }),
-    Case("Asynchronous Test (200ms timeout)", []() {
-        TEST_ASSERT_TRUE_MESSAGE(true, "(true == false) o_O");
-        minar::Scheduler::postCallback([]() {
-                Harness::validate_callback();
-            }).delay(minar::milliseconds(100));
-        return CaseTimeout(200);
-    }),
-    Case("Asynchronous Timeout Repeat", [](const size_t call_count) -> control_t {
-        TEST_ASSERT_TRUE_MESSAGE(true, "(true == false) o_O");
-        if (call_count >= 5) {
-            minar::Scheduler::postCallback([]() {
-                    Harness::validate_callback();
-                }).delay(minar::milliseconds(100));
-        }
-        return CaseRepeatHandlerOnTimeout(200);
-    })
-};
+// [...] Add your test cases and specification here.
 
-Specification specification([](const size_t number_of_cases) {
-    MBED_HOSTTEST_TIMEOUT(20);
-    MBED_HOSTTEST_SELECT(default_auto);
-    MBED_HOSTTEST_DESCRIPTION(utest greentea example);
-    MBED_HOSTTEST_START("MBED_OS");
-    return greentea_test_setup_handler(number_of_cases);
-}, cases);
-
-void app_start(int, char*[]) {
+void main() // or whatever your custom entry point is
+{
+    // You MUST set the custom scheduler before running the specification.
+    Harness::set_scheduler(utest_minimal_scheduler);
     Harness::run(specification);
+
+    while(1) {
+        if (minimal_callback) {
+            // copy the callback and reset the shared memory
+            utest_v1_harness_callback_t callback = minimal_callback;
+            minimal_callback = NULL;
+            callback(); // execute the copied callback
+        }
+    }
+}
+```
+
+### Example Asynchronous Scheduler
+
+Here is the a [complete scheduler implementation with any asynchronous support](test/minimal_scheduler_async/main.cpp). Note that this does require at least a hardware timer, in this case we have used `mbed-hal/us_ticker`! Note that you must not execute the callback in the timer interrupt context, but in the main loop context!
+```cpp
+volatile utest_v1_harness_callback_t minimal_callback;
+volatile utest_v1_harness_callback_t ticker_callback;
+const ticker_data_t *ticker_data;
+ticker_event_t ticker_event;
+
+static void ticker_handler(uint32_t) {
+    minimal_callback = ticker_callback; // interrupt context!
+}
+static void* utest_minimal_post(const utest_v1_harness_callback_t callback, const uint32_t delay_ms) {
+    if (delay_ms) {
+        ticker_callback = callback;
+        ticker_insert_event(ticker_data, &ticker_event, ticker_read(ticker_data) + delay_ms * 1000, 0);
+    }
+    else minimal_callback = callback;
+    return (void*)1;
+}
+static int32_t utest_minimal_cancel(void*) {
+    ticker_remove_event(ticker_data, &ticker_event);
+    return 0;   // canceling is supported
+}
+static const utest_v1_scheduler_t utest_minimal_scheduler = {utest_minimal_post, utest_minimal_cancel};
+
+// [...] Add your test cases and specification here.
+
+void main() // or whatever your custom entry point is
+{
+    ticker_data = get_us_ticker_data(); // initialize the ticker data.
+    ticker_set_handler(ticker_data, ticker_handler);
+    // You MUST set the custom scheduler before running the specification.
+    Harness::set_scheduler(utest_minimal_scheduler);
+    Harness::run(specification);
+
+    while(1) {
+        if (minimal_callback) {
+            // copy the callback and reset the shared memory
+            utest_v1_harness_callback_t callback = minimal_callback;
+            minimal_callback = NULL;
+            callback(); // execute the copied callback
+        }
+    }
 }
 ```
