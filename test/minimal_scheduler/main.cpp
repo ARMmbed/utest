@@ -29,6 +29,11 @@ using namespace utest::v1;
 volatile utest_v1_harness_callback_t minimal_callback;
 
 // Scheduler ----------------------------------------------------------------------------------------------------------
+static int32_t utest_minimal_init()
+{
+    minimal_callback = NULL;
+    return 0;
+}
 static void *utest_minimal_post(const utest_v1_harness_callback_t callback, const uint32_t delay_ms)
 {
     minimal_callback = callback;
@@ -41,10 +46,32 @@ static int32_t utest_minimal_cancel(void *handle)
     // this scheduler does not support canceling of asynchronous callbacks
     return -1;
 }
+static int32_t utest_minimal_run()
+{
+    /* This is the amazing minimal scheduler.
+     * This is just a busy loop that calls the callbacks in this context.
+     * THIS LOOP IS BLOCKING.
+     */
+    while(1)
+    {
+        // check if a new callback has been set
+        if (minimal_callback) {
+            // copy the callback
+            utest_v1_harness_callback_t callback = minimal_callback;
+            // reset the shared callback
+            minimal_callback = NULL;
+            // execute the copied callback
+            callback();
+        }
+    }
+    return 0;
+}
 static const utest_v1_scheduler_t utest_minimal_scheduler =
 {
+    utest_minimal_init,
     utest_minimal_post,
-    utest_minimal_cancel
+    utest_minimal_cancel,
+    utest_minimal_run
 };
 
 // Tests --------------------------------------------------------------------------------------------------------------
@@ -95,21 +122,4 @@ void app_start(int, char*[])
     Harness::set_scheduler(utest_minimal_scheduler);
     // Run the specification only AFTER setting the custom scheduler.
     Harness::run(specification);
-
-    /* This is the amazing minimal scheduler.
-     * This is just a busy loop that calls the callbacks in this context.
-     * THIS LOOP IS BLOCKING.
-     */
-    while(1)
-    {
-        // check if a new callback has been set
-        if (minimal_callback) {
-            // copy the callback
-            utest_v1_harness_callback_t callback = minimal_callback;
-            // reset the shared callback
-            minimal_callback = NULL;
-            // execute the copied callback
-            callback();
-        }
-    }
 }

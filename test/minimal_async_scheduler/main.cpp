@@ -41,6 +41,14 @@ static void ticker_handler(uint32_t)
     minimal_callback = ticker_callback;
 }
 
+static int32_t utest_minimal_init()
+{
+    minimal_callback = NULL;
+    ticker_callback = NULL;
+    // initialize the ticker data.
+    ticker_data = get_us_ticker_data();
+    return 0;
+}
 static void *utest_minimal_post(const utest_v1_harness_callback_t callback, const uint32_t delay_ms)
 {
     printf("\t\t>>> Schedule %p with %ums delay => %p.\n", callback, (unsigned int)delay_ms, (void*)1);
@@ -64,10 +72,34 @@ static int32_t utest_minimal_cancel(void *handle)
     ticker_remove_event(ticker_data, &ticker_event);
     return 0;
 }
+static int32_t utest_minimal_run()
+{
+    /* This is the amazing minimal scheduler.
+     * This is just a busy loop that calls the callbacks in this context.
+     * THIS LOOP IS BLOCKING.
+     */
+    while(1)
+    {
+        // check if a new callback has been set
+        if (minimal_callback)
+        {
+            printf("\t\t>>> Firing callback %p\n", minimal_callback);
+            // copy the callback
+            utest_v1_harness_callback_t callback = minimal_callback;
+            // reset the shared callback
+            minimal_callback = NULL;
+            // execute the copied callback
+            callback();
+        }
+    }
+    return 0;
+}
 static const utest_v1_scheduler_t utest_minimal_scheduler =
 {
+    utest_minimal_init,
     utest_minimal_post,
-    utest_minimal_cancel
+    utest_minimal_cancel,
+    utest_minimal_run
 };
 
 // Tests --------------------------------------------------------------------------------------------------------------
@@ -128,25 +160,4 @@ void app_start(int, char*[])
     Harness::set_scheduler(utest_minimal_scheduler);
     // Run the specification only AFTER setting the custom scheduler.
     Harness::run(specification);
-
-    // initialize the ticker data.
-    ticker_data = get_us_ticker_data();
-    /* This is the amazing minimal scheduler.
-     * This is just a busy loop that calls the callbacks in this context.
-     * THIS LOOP IS BLOCKING.
-     */
-    while(1)
-    {
-        // check if a new callback has been set
-        if (minimal_callback)
-        {
-            printf("\t\t>>> Firing callback %p\n", minimal_callback);
-            // copy the callback
-            utest_v1_harness_callback_t callback = minimal_callback;
-            // reset the shared callback
-            minimal_callback = NULL;
-            // execute the copied callback
-            callback();
-        }
-    }
 }
