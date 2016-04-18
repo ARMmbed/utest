@@ -18,28 +18,6 @@
 
 #include "utest/harness.h"
 #include <stdlib.h>
-#include "core-util/CriticalSectionLock.h"
-
-
-#ifndef YOTTA_CFG_UTEST_USE_CUSTOM_SCHEDULER
-#include "minar/minar.h"
-
-static void *utest_minar_post(const utest_v1_harness_callback_t callback, const uint32_t delay_ms)
-{
-    void *handle = minar::Scheduler::postCallback(callback).delay(minar::milliseconds(delay_ms)).getHandle();
-    return handle;
-}
-static int32_t utest_minar_cancel(void *handle)
-{
-    int32_t ret = minar::Scheduler::cancelCallback(handle);
-    return ret;
-}
-static const utest_v1_scheduler_t utest_minar_scheduler =
-{
-    utest_minar_post,
-    utest_minar_cancel
-};
-#endif
 
 using namespace utest::v1;
 
@@ -71,27 +49,28 @@ namespace
 
     location_t location = LOCATION_UNKNOWN;
 
-#ifndef YOTTA_CFG_UTEST_USE_CUSTOM_SCHEDULER
-    utest_v1_scheduler_t scheduler = utest_minar_scheduler;
-#else
-    utest_v1_scheduler_t scheduler = {NULL, NULL};
-#endif
+    utest_v1_scheduler_t scheduler = {NULL, NULL, NULL, NULL};
 }
 
 static void die() {
     while(1) ;
 }
 
-bool Harness::set_scheduler(const utest_v1_scheduler_t scheduler)
+static bool is_scheduler_valid(const utest_v1_scheduler_t scheduler)
 {
-    if (!scheduler.post || !scheduler.cancel)
-        return false;
-
-    ::scheduler = scheduler;
-    return true;
+    return (scheduler.init && scheduler.post && scheduler.cancel && scheduler.run);
 }
 
-bool Harness::run(const Specification& specification, std::size_t)
+bool Harness::set_scheduler(const utest_v1_scheduler_t scheduler)
+{
+    if (is_scheduler_valid(scheduler)) {
+        ::scheduler = scheduler;
+        return true;
+    }
+    return false;
+}
+
+bool Harness::run(const Specification& specification, size_t)
 {
     return run(specification);
 }
@@ -102,7 +81,14 @@ bool Harness::run(const Specification& specification)
     if (is_busy())
         return false;
 
-    if (!scheduler.post || !scheduler.cancel)
+    // if the scheduler is invalid, this is the first time we are calling
+    if (!is_scheduler_valid(scheduler))
+        scheduler = utest_v1_get_scheduler();
+    // if the scheduler is still invalid, abort
+    if (!is_scheduler_valid(scheduler))
+        return false;
+    // if the scheduler failed to initialize, abort
+    if (scheduler.init() != 0)
         return false;
 
     test_cases  = specification.cases;
@@ -143,6 +129,14 @@ bool Harness::run(const Specification& specification)
     case_current = &test_cases[case_index];
 
     scheduler.post(run_next_case, 0);
+    if (scheduler.run() != 0) {
+        failure.reason = REASON_SCHEDULER;
+        if (handlers.test_failure) handlers.test_failure(failure);
+        if (handlers.test_teardown) handlers.test_teardown(0, 0, failure);
+        test_cases = NULL;
+        exit(1);
+        return true;
+    }
     return true;
 }
 
@@ -154,7 +148,7 @@ void Harness::raise_failure(const failure_reason_t reason)
 
     status_t fail_status = STATUS_ABORT;
     {
-        mbed::util::CriticalSectionLock lock;
+        UTEST_ENTER_CRITICAL_SECTION;
 
         if (handlers.test_failure) handlers.test_failure(failure_t(reason, location));
         if (handlers.case_failure) fail_status = handlers.case_failure(case_current, failure_t(reason, location));
@@ -165,6 +159,7 @@ void Harness::raise_failure(const failure_reason_t reason)
             scheduler.cancel(case_timeout_handle);
             case_timeout_handle = NULL;
         }
+        UTEST_LEAVE_CRITICAL_SECTION;
     }
 
     if (fail_status == STATUS_ABORT || reason & REASON_CASE_SETUP) {
@@ -227,12 +222,13 @@ void Harness::schedule_next_case()
 void Harness::handle_timeout()
 {
     {
-        mbed::util::CriticalSectionLock lock;
+        UTEST_ENTER_CRITICAL_SECTION;
 
         if (case_timeout_handle != NULL) {
             case_timeout_handle = NULL;
             case_timeout_occurred = true;
         }
+        UTEST_LEAVE_CRITICAL_SECTION;
     }
     if (case_timeout_occurred) {
         raise_failure(failure_reason_t(REASON_TIMEOUT | ((case_control.repeat & REPEAT_ON_TIMEOUT) ? REASON_IGNORE : 0)));
@@ -242,7 +238,7 @@ void Harness::handle_timeout()
 
 void Harness::validate_callback(const control_t control)
 {
-    mbed::util::CriticalSectionLock lock;
+    UTEST_ENTER_CRITICAL_SECTION;
     case_validation_count++;
 
     if (case_timeout_handle != NULL || case_control.timeout == TIMEOUT_FOREVER)
@@ -254,15 +250,18 @@ void Harness::validate_callback(const control_t control)
         case_control.timeout = TIMEOUT_NONE;
         scheduler.post(schedule_next_case, 0);
     }
+    UTEST_LEAVE_CRITICAL_SECTION;
 }
 
 bool Harness::is_busy()
 {
-    mbed::util::CriticalSectionLock lock;
+    UTEST_ENTER_CRITICAL_SECTION;
     if (!test_cases)   return false;
     if (!case_current) return false;
 
-    return (case_current < (test_cases + test_length));
+    bool res = (case_current < (test_cases + test_length));
+    UTEST_LEAVE_CRITICAL_SECTION;
+    return res;
 }
 
 void Harness::run_next_case()
@@ -282,11 +281,12 @@ void Harness::run_next_case()
 
         repeat_t setup_repeat;
         {
-            mbed::util::CriticalSectionLock lock;
+            UTEST_ENTER_CRITICAL_SECTION;
             case_validation_count = 0;
             case_timeout_occurred = false;
             setup_repeat = case_control.repeat;
             case_control = control_t();
+            UTEST_LEAVE_CRITICAL_SECTION;
         }
 
         if (setup_repeat & REPEAT_SETUP_TEARDOWN) {
@@ -311,7 +311,7 @@ void Harness::run_next_case()
         case_repeat_count++;
 
         {
-            mbed::util::CriticalSectionLock lock;
+            UTEST_ENTER_CRITICAL_SECTION;
             if (case_validation_count) case_control.repeat = repeat_t(case_control.repeat & ~REPEAT_ON_TIMEOUT);
 
             // if timeout valid
@@ -328,6 +328,7 @@ void Harness::run_next_case()
             else {
                 scheduler.post(schedule_next_case, 0);
             }
+            UTEST_LEAVE_CRITICAL_SECTION;
         }
     }
     else if (handlers.test_teardown) {
