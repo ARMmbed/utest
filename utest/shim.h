@@ -30,8 +30,10 @@
 #   ifndef __deprecated_message
 #       if defined(__CC_ARM)
 #           define __deprecated_message(msg) __attribute__((deprecated))
-#       else
+#       elif defined(__GNUC__)
 #           define __deprecated_message(msg) __attribute__((deprecated(msg)))
+#       else
+#           define __deprecated_message(msg)
 #       endif
 #   endif
 #endif
