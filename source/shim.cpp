@@ -55,9 +55,9 @@ utest_v1_scheduler_t utest_v1_get_scheduler()
 
 #elif UTEST_SHIM_SCHEDULER_USE_US_TICKER
 #ifdef YOTTA_MBED_HAL_VERSION_STRING
-#   include "mbed-hal/us_ticker.h"
+#   include "mbed-hal/us_ticker_api.h"
 #else
-#   include "us_ticker.h"
+#   include "us_ticker_api.h"
 #endif
 // only one callback is active at any given time
 static volatile utest_v1_harness_callback_t minimal_callback;
